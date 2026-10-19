@@ -125,7 +125,7 @@ test('в руководстве описана каждая кнопка инт�
   const collect = () => p.$$('#scientific-btns .btn, #simple-btns .btn').forEach(b => labels.add(b.textContent.trim()));
   for (const inv of [false, true]) {
     if (p.$('#btn-inv').classList.contains('active') !== inv) p.$('#btn-inv').click();
-    for (let i = 0; i < 6; i++) { collect(); labels.add(p.$('#btn-fn').textContent); p.$('#btn-fn').click(); }
+    for (let i = 0; i < 20; i++) { collect(); labels.add(p.$('#btn-fn').textContent); p.$('#btn-fn').click(); } // с запасом: страницы замыкаются в круг
   }
   p.$$('.mode-btn').forEach(b => labels.add(b.textContent.trim()));
   ['#unit-swap', '#curr-swap', '#refresh-rates', '#help-sci'].forEach(s => labels.add(p.$(s).textContent.trim()));
@@ -134,7 +134,7 @@ test('в руководстве описана каждая кнопка инт�
   labels.add('Fn');
   const missing = [...labels].filter(l => l && !manual.includes(l));
   assert.deepEqual(missing, []);
-  assert.ok(labels.size > 70, `кнопок найдено мало: ${labels.size}`);
+  assert.ok(labels.size > 100, `кнопок найдено мало: ${labels.size}`);
 });
 
 test('руководство ссылается только на существующие файлы и команды', () => {

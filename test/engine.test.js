@@ -130,12 +130,12 @@ test('логарифмы, корни, степени', () => {
   assert.equal(show('27^(1/3)'), '3');
   assert.equal(show('10^-2'), '0.01');
   fails('ln(0)', /Логарифм/);
-  fails('log(-1)', /Логарифм/);
+  assert.equal(show('log(-1)'), '1.364376i');
   fails('log2(0)', /Логарифм/);
   fails('log(5,1)', /Основание/);
   fails('log(5,-2)', /Основание/);
-  fails('sqrt(-4)', /отрицательного/);
-  fails('(-8)^(1/3)', /вещественным/);
+  assert.equal(show('sqrt(-4)'), '2i');
+  assert.equal(show('(-8)^(1/3)'), '1+1.732051i');
   fails('0^-1', /Деление на ноль/);
 });
 
@@ -337,8 +337,9 @@ test('реестр функций: у каждой есть аргументы �
   assert.ok(E.FUNCTION_NAMES.length >= 40);
   for (const name of E.FUNCTION_NAMES) {
     const f = E.FUNCTIONS[name];
+    if (!f) { assert.ok(E.SPECIAL[name], name); continue; } // формы с переменной описаны в SPECIAL
     assert.equal(typeof f.f, 'function', name);
-    assert.ok(f.n[0] >= 1 && f.n[1] >= f.n[0], name);
+    assert.ok(f.n[0] >= 0 && f.n[1] >= f.n[0], name);
   }
 });
 
@@ -355,7 +356,8 @@ test('фаззинг: любые входы дают число/матрицу �
     for (const deg of [true, false]) {
       try {
         const v = E.evaluate(s, { deg, ans: 5 });
-        const nums = v instanceof E.Matrix ? v.rows.flat() : [v];
+        const cells = v instanceof E.Matrix ? v.rows.flat() : [v];
+        const nums = cells.flatMap(c => (c instanceof E.Complex ? [c.re, c.im] : c instanceof E.Text ? [c.n] : [c]));
         for (const n of nums) assert.ok(Number.isFinite(n) && !Object.is(n, -0), `${s} → ${n}`);
         E.formatValue(v, 6);
         ok++;

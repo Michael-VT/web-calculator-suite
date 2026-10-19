@@ -5,6 +5,7 @@
 Wissenschaftlicher Taschenrechner, Einheiten- und Währungsumrechner in einer einzigen `index.html`. **Keine externen Bibliotheken oder Schriften** (Internet wird nur für Wechselkurse benötigt), helles und dunkles Design, bequem auf dem Smartphone.
 
 - **Wissenschaftlich**: Trigonometrie (Deg/Rad), Hyperbelfunktionen, Logarithmen, Potenzen, Prozente, Fakultät, Matrizen (`det`, `inv`, `transpose`, …), Statistik, ggT/kgV, Kombinatorik, Runden; Verlauf, `Ans`, Tastatureingabe.
+- **Höhere Mathematik**: komplexe Zahlen (`i`), Gleichungen (`solve`), Ableitungen, Integrale, Grenzwerte, Summen und Produkte, Regression und Normalverteilung, Primzahlen und Faktorisierung, Zahlensysteme und Bit-Operationen, Vektoren, `lsolve`, `eig`.
 - **Einfach**: große Tasten.
 - **Einheiten**: 12 Kategorien, darunter astronomische und alte russische Maße.
 - **Währungen**: 12 Währungen, Umrechnung in beide Richtungen, Kursdiagramm, Offline-Modus.
@@ -47,6 +48,7 @@ Die Tests laufen bei jedem Push über GitHub Actions (`.github/workflows/test.ym
 index.html            Seite
 css/style.css         Gestaltung (helles/dunkles Design)
 js/calc-engine.js     Parsen und Auswerten von Ausdrücken (ohne DOM)
+js/numeric.js        numerische Algorithmen: Nullstellen, Integrale, Primzahlen, Spezialfunktionen (ohne DOM)
 js/converters.js      Einheiten und Währungen (ohne DOM)
 js/app.js             Benutzeroberfläche
 docs/                 Handbuch und Architekturdokumente

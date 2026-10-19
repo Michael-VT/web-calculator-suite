@@ -5,6 +5,7 @@
 Calculadora científica, conversor de unidades e de moedas num único `index.html`. **Sem bibliotecas nem fontes externas** (a internet só é necessária para as taxas de câmbio), tema claro e escuro, confortável no telemóvel.
 
 - **Científica**: trigonometria (Deg/Rad), funções hiperbólicas, logaritmos, potências, percentagens, fatorial, matrizes (`det`, `inv`, `transpose`, …), estatística, MDC/MMC, combinatória, arredondamento; histórico, `Ans`, teclado.
+- **Matemática avançada**: números complexos (`i`), equações (`solve`), derivadas, integrais, limites, somas e produtos, regressão e distribuição normal, números primos e fatoração, bases numéricas e operações com bits, vetores, `lsolve`, `eig`.
 - **Simples**: botões grandes.
 - **Unidades**: 12 categorias, incluindo astronómicas e antigas medidas russas.
 - **Moedas**: 12 moedas, conversão nos dois sentidos, gráfico da taxa, modo offline.
@@ -47,6 +48,7 @@ Os testes correm a cada push através do GitHub Actions (`.github/workflows/test
 index.html            página
 css/style.css         estilo (tema claro/escuro)
 js/calc-engine.js     análise e cálculo de expressões (sem DOM)
+js/numeric.js        algoritmos numéricos: raízes, integrais, primos, funções especiais (sem DOM)
 js/converters.js      unidades e moedas (sem DOM)
 js/app.js             interface
 docs/                 manual e documentos de arquitetura

@@ -246,6 +246,23 @@ test('Fn: перебор наборов и Inv', async (t) => {
   p.press('Comb');
   assert.deepEqual(labels(), ['round', 'floor', 'ceil', 'trunc', 'sign', 'abs']);
   p.press('Rnd');
+  // новые наборы идут после прежних шести
+  const next = (name, want) => { assert.equal(p.$('#btn-fn').textContent, name); assert.deepEqual(labels(), want); p.press(name); };
+  assert.equal(p.$('#btn-fn').textContent, 'Alg');
+  assert.deepEqual(labels(), ['sec', 'nthroot', 'csc', 'deg', 'cot', 'rad']);
+  p.press('Inv');
+  assert.deepEqual(labels(), ['asec', 'nthroot', 'acsc', 'deg', 'acot', 'rad']);
+  p.press('Inv');
+  p.press('Alg');
+  next('Cplx', ['i', 'abs', 'arg', 'conj', 're', 'im']);
+  next('Calc', ['solve', 'diff', '∫', 'lim', 'Σ', 'Π']);
+  next('Var', ['x', 'y', 'k', 't', 'a', 'φ']);
+  next('Num', ['prime?', 'factor', 'fib', 'frac', 'rand', 'randint']);
+  next('Base', ['bin', 'oct', 'hex', 'base', 'and', 'or']);
+  next('Misc', ['xor', 'shl', 'shr', 'Γ', 'erf', 'binom']);
+  next('Stat2', ['mode', 'var', 'varp', 'perc', 'cov', 'corr']);
+  next('Reg', ['linreg', 'normpdf', 'normcdf', 'sech', 'csch', 'coth']);
+  next('Mat2', ['rank', 'lsolve', 'dot', 'cross', 'eig', 'norm']);
   assert.equal(p.$('#btn-fn').textContent, 'Trig');
   noErrors(p);
 });
@@ -278,7 +295,7 @@ test('каждая функциональная кнопка: корректно
   const seen = new Set();
   for (const inv of [false, true]) {
     if (p.$('#btn-inv').classList.contains('active') !== inv) p.press('Inv');
-    for (let page = 0; page < 6; page++) {
+    for (let page = 0; page < 16; page++) {
       for (let i = 0; i < 6; i++) {
         const b = p.$(`[data-slot="${i}"]`);
         const val = b.dataset.val;
@@ -287,7 +304,7 @@ test('каждая функциональная кнопка: корректно
         const shown = p.display();
         assert.ok(shown.length > 0 && !/undefined|NaN/.test(shown), `${b.textContent}: ${shown}`);
         if (val.endsWith('(')) {
-          assert.ok(E.FUNCTIONS[val.slice(0, -1).toLowerCase()], `функция ${val} не существует в движке`);
+          assert.ok(E.FUNCTIONS[val.slice(0, -1).toLowerCase()] || E.SPECIAL[val.slice(0, -1).toLowerCase()], `функция ${val} не существует в движке`);
           p.type((sample[val] || '1)').replace(/[\[\],]/g, c => c));
         }
         seen.add(val);
@@ -297,7 +314,7 @@ test('каждая функциональная кнопка: корректно
     }
   }
   p.press('AC');
-  assert.ok(seen.size >= 30, String(seen.size));
+  assert.ok(seen.size >= 70, String(seen.size));
   noErrors(p);
 });
 
@@ -322,7 +339,7 @@ test('матрицы с кнопок: det, inv, trans, trace, eye, умноже�
   p.press('AC'); typeM('[[1,2],[3,4]]*[[0,1],[1,0]]'); p.press('=');
   assert.equal(p.display(), '[[2, 1], [4, 3]]');
   p.press('AC'); typeM('[[1,2],[2,4]]');
-  p.press('Mat'); p.press('Stat'); p.press('Comb'); p.press('Rnd'); p.press('Trig'); // вернуться к Trig
+  while (p.$('#btn-fn').textContent !== 'Trig') p.press(p.$('#btn-fn').textContent); // вернуться к Trig
   p.press('AC', 'inv(' === 'x' ? '' : '1');
   noErrors(p);
 });
@@ -364,7 +381,8 @@ test('ошибки: понятное сообщение, выражение не
   assert.equal(p.error(), '');
   assert.equal(p.display(), '0.5');
   p.press('AC', 'sqrt(', '-', '4', '=');
-  assert.match(p.error(), /отрицательного/);
+  assert.equal(p.display(), '2i');
+  assert.equal(p.error(), '');
   p.press('AC', '2', '+', '=');
   assert.match(p.error(), /неполное/);
   p.press('AC', '0', '!');
@@ -426,7 +444,7 @@ test('клавиатура: цифры, операторы, Enter, Esc, Backspac
   p.key('Escape');
   p.key('3'); p.key('x'); p.key('4'); p.key('Enter');
   assert.equal(p.display(), '12');
-  assert.equal(p.key('q').defaultPrevented, false);
+  assert.equal(p.key('F5').defaultPrevented, false); // посторонняя клавиша не перехватывается
   const ctrl = new p.win.KeyboardEvent('keydown', { key: '1', ctrlKey: true, bubbles: true, cancelable: true });
   p.doc.body.dispatchEvent(ctrl);
   assert.equal(p.display(), '12');
@@ -783,5 +801,31 @@ test('все кнопки обеих клавиатур отзываются п�
       while (p.$('#btn-fn').textContent !== 'Trig' && g === '#scientific-btns') p.press(p.$('#btn-fn').textContent);
     }
   }
+  noErrors(p);
+});
+
+test('клавиатура: имена функций, переменная (Shift+X) и уравнение внутри solve(...)', async (t) => {
+  const p = await page(t);
+  const typeKeys = s => [...s].forEach(k => p.key(k));
+  typeKeys('solve(X^2=4,X)');
+  assert.equal(p.display(), 'solve(x^2=4,x)');
+  p.key('Enter');
+  assert.equal(p.display(), '[-2, 2]');
+  p.key('Escape');
+  typeKeys('log10(1000)');   // цифры после имени функции остаются частью имени
+  assert.equal(p.display(), 'log10(1000)');
+  p.key('Enter');
+  assert.equal(p.display(), '3');
+  p.key('Escape');
+  typeKeys('sigma(k^2,k,1,10)');
+  p.key('Enter');
+  assert.equal(p.display(), '385');
+  p.key('Escape');
+  typeKeys('(1+2i)*(3-4i)');
+  p.key('Enter');
+  assert.equal(p.display(), '11+2i');
+  p.key('Escape');
+  p.key('2'); p.key('='); // вне скобок «=» вычисляет
+  assert.equal(p.display(), '2');
   noErrors(p);
 });

@@ -33,7 +33,38 @@
       { l: 'nPr', v: 'nPr(' }, { l: 'mod', v: 'mod(' }, { l: 'hypot', v: 'hypot(' }] },
     { name: 'Rnd', cls: 'special', slots: [
       { l: 'round', v: 'round(' }, { l: 'floor', v: 'floor(' }, { l: 'ceil', v: 'ceil(' },
-      { l: 'trunc', v: 'trunc(' }, { l: 'sign', v: 'sign(' }, { l: 'abs', v: 'abs(' }] }
+      { l: 'trunc', v: 'trunc(' }, { l: 'sign', v: 'sign(' }, { l: 'abs', v: 'abs(' }] },
+    { name: 'Alg', cls: 'trig', slots: [
+      { l: 'sec', v: 'sec(', inv: { l: 'asec', v: 'asec(' } }, { l: 'nthroot', v: 'nthroot(' },
+      { l: 'csc', v: 'csc(', inv: { l: 'acsc', v: 'acsc(' } }, { l: 'deg', v: 'deg(' },
+      { l: 'cot', v: 'cot(', inv: { l: 'acot', v: 'acot(' } }, { l: 'rad', v: 'rad(' }] },
+    { name: 'Cplx', cls: 'const', slots: [
+      { l: 'i', v: 'i' }, { l: 'abs', v: 'abs(' }, { l: 'arg', v: 'arg(' },
+      { l: 'conj', v: 'conj(' }, { l: 're', v: 're(' }, { l: 'im', v: 'im(' }] },
+    { name: 'Calc', cls: 'special', slots: [
+      { l: 'solve', v: 'solve(' }, { l: 'diff', v: 'diff(' }, { l: '∫', v: 'integral(' },
+      { l: 'lim', v: 'limit(' }, { l: 'Σ', v: 'sigma(' }, { l: 'Π', v: 'product(' }] },
+    { name: 'Var', cls: 'special', slots: [
+      { l: 'x', v: 'x' }, { l: 'y', v: 'y' }, { l: 'k', v: 'k' },
+      { l: 't', v: 't' }, { l: 'a', v: 'a' }, { l: 'φ', v: 'phi' }] },
+    { name: 'Num', cls: 'const', slots: [
+      { l: 'prime?', v: 'isprime(' }, { l: 'factor', v: 'factor(' }, { l: 'fib', v: 'fib(' },
+      { l: 'frac', v: 'frac(' }, { l: 'rand', v: 'random()' }, { l: 'randint', v: 'randint(' }] },
+    { name: 'Base', cls: 'const', slots: [
+      { l: 'bin', v: 'bin(' }, { l: 'oct', v: 'oct(' }, { l: 'hex', v: 'hex(' },
+      { l: 'base', v: 'base(' }, { l: 'and', v: 'band(' }, { l: 'or', v: 'bor(' }] },
+    { name: 'Misc', cls: 'const', slots: [
+      { l: 'xor', v: 'bxor(' }, { l: 'shl', v: 'shl(' }, { l: 'shr', v: 'shr(' },
+      { l: 'Γ', v: 'gamma(' }, { l: 'erf', v: 'erf(' }, { l: 'binom', v: 'binom(' }] },
+    { name: 'Stat2', cls: 'stat', slots: [
+      { l: 'mode', v: 'mode(' }, { l: 'var', v: 'var(' }, { l: 'varp', v: 'varp(' },
+      { l: 'perc', v: 'percentile(' }, { l: 'cov', v: 'cov(' }, { l: 'corr', v: 'corr(' }] },
+    { name: 'Reg', cls: 'stat', slots: [
+      { l: 'linreg', v: 'linreg(' }, { l: 'normpdf', v: 'normpdf(' }, { l: 'normcdf', v: 'normcdf(' },
+      { l: 'sech', v: 'sech(' }, { l: 'csch', v: 'csch(' }, { l: 'coth', v: 'coth(' }] },
+    { name: 'Mat2', cls: 'matrix', slots: [
+      { l: 'rank', v: 'rank(' }, { l: 'lsolve', v: 'lsolve(' }, { l: 'dot', v: 'dot(' },
+      { l: 'cross', v: 'cross(' }, { l: 'eig', v: 'eig(' }, { l: 'norm', v: 'norm(' }] }
   ];
 
   const displayEl = $('display');
@@ -122,7 +153,9 @@
       if (/[0-9]$/.test(e)) e += '.';
       else e += operandEnd.test(e) ? '*0.' : '0.';
     } else if (/^[0-9]$/.test(val)) {
-      if (/(^|[^0-9.])0$/.test(e)) e = e.slice(0, -1) + val;
+      const ident = /([A-Za-z]+)[0-9]*$/.exec(e);
+      if (ident && E.FUNCTION_NAMES.includes(ident[1].toLowerCase())) e += val; // набор с клавиатуры: log10, atan2
+      else if (/(^|[^0-9.])0$/.test(e)) e = e.slice(0, -1) + val;
       else if (!expPending && /[)\]!%A-Za-z]$/.test(e)) e += '*' + val;
       else e += val;
     } else if (val === 'E') {
@@ -142,6 +175,13 @@
       e += val;
     }
     state.expr = e;
+    render();
+  }
+
+  function typeChar(ch) {
+    state.error = '';
+    if (state.justEvaluated) { state.justEvaluated = false; state.expr = ''; }
+    state.expr += ch;
     render();
   }
 
@@ -226,8 +266,10 @@
     let handled = true;
     if (k.length === 1 && (/[0-9]/.test(k) || '+-*/^()[]!%.'.includes(k))) insert(k);
     else if (k === ',') insert(open(state.expr, '(', ')') + open(state.expr, '[', ']') > 0 ? ',' : '.');
-    else if (k === 'x' || k === 'X') insert('*');
+    else if (k === 'x') insert('*');
+    else if (k === '=' && open(state.expr, '(', ')') > 0) typeChar('='); // уравнение внутри solve(...)
     else if (k === 'Enter' || k === '=') calculate();
+    else if (/^[A-Za-z]$/.test(k)) typeChar(k === 'X' ? 'x' : k); // имена функций и переменные; Shift+X — переменная x
     else if (k === 'Escape' || k === 'Delete') clearAll();
     else if (k === 'Backspace') backspace();
     else handled = false;

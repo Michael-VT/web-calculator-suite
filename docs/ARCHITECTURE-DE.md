@@ -11,6 +11,7 @@ Das Programm ist eine statische Seite ohne Build-Schritt und ohne Laufzeit-Abhä
 | `index.html` | Seitenaufbau: Anzeige, die beiden Tastenfelder (wissenschaftlich / einfach), Panels „Einheiten“ und „Währungen“, Hilfefenster |
 | `css/style.css` | Gestaltung; helles/dunkles Design über CSS-Variablen, responsives Layout |
 | `js/calc-engine.js` | `CalcEngine`: Parsen und Auswerten von Ausdrücken, Formatierung des Ergebnisses (ohne DOM) |
+| `js/numeric.js` | `CalcNumeric`: reine numerische Algorithmen — Gamma, erf, Polynomnullstellen, Nullstellensuche, Ableitung, Integral, Primzahltest, Faktorisierung (ohne DOM) |
 | `js/converters.js` | `Converters`: Einheiten, Währungen, Laden der Kurse, Diagrammdaten (ohne DOM) |
 | `js/app.js` | Oberfläche: Zustand, Tastenbehandlung, Tastatur, Modi, Zeichnen des Diagramms, Hilfe |
 | `docs/MANUAL.md` | Benutzerhandbuch (auf Russisch); seine Beispiele werden von den Tests ausgeführt |
@@ -45,7 +46,7 @@ Beide Logikdateien verwenden denselben Wrapper (UMD): `module.exports` in Node, 
 
 ### Funktionsregister
 
-`FUNCTIONS` ordnet einem Namen `{ n: [min, max], f(args, ctx, name) }` zu. 46 Namen (ohne die Synonyme `trans`, `identity`, `fact`):
+`FUNCTIONS` ordnet einem Namen `{ n: [min, max], f(args, ctx, name) }` zu. 95 Namen (ohne die Synonyme `trans`, `identity`, `fact`) und die 6 Sonderformen aus `SPECIAL`; hier stehen die ursprünglichen 46, die übrigen im Abschnitt „Höhere Mathematik“ unten und im Handbuch:
 
 - Trigonometrie und Umkehrfunktionen: `sin cos tan asin acos atan atan2` (Deg/Rad über `ctx.deg`); Hyperbelfunktionen: `sinh cosh tanh asinh acosh atanh`
 - Exponentialfunktion, Logarithmen, Wurzeln: `exp ln log10 log2 log sqrt cbrt hypot`
@@ -55,6 +56,14 @@ Beide Logikdateien verwenden denselben Wrapper (UMD): `module.exports` in Node, 
 - Matrizen: `det inv transpose trace eye size`
 
 Hilfsfunktionen: `ew(f)` wendet eine Ein-Zahl-Funktion elementweise an (auf eine Zahl oder auf jedes Matrixelement); `num`, `ints`, `flat` prüfen Argumenttypen und lösen lesbare Fehler aus.
+
+### Höhere Mathematik
+
+Werte sind `number`, `Matrix`, `Complex` (`re`, `im`; wird bei vernachlässigbarem Imaginärteil wieder zu einer gewöhnlichen Zahl, siehe `cx`) und `Text` (Ergebnisse von `bin`, `hex`, `frac`…; `Text.n` behält die Zahl für `Ans`). `sqrt`, `ln`, `log*` und gebrochene Potenzen negativer Zahlen liefern `Complex`. Funktionen mit dem Merkmal `cx: true` akzeptieren komplexe Argumente, alle anderen lehnen sie ab; `plain()` verhindert, dass `Text` und komplexe Matrizen weiterverrechnet werden.
+
+Unbekannte Bezeichner werden zu `var`-Knoten und aus `ctx.vars` aufgelöst. Die Sonderformen `solve diff integral limit sigma product` (`SPECIAL`) erhalten das erste Argument als AST und das zweite als Variablennamen und werten den AST viele Male mit gebundener Variable aus (`withVar`, `realFn`). `solve` prüft zuerst, ob der Ausdruck ein Polynom vom Grad ≤ 8 ist (endliche Differenzen plus Kontrolle an weit entfernten Punkten, damit `sin` in Grad nicht für ein Polynom gehalten wird), und verwendet dann das Aberth-Verfahren; andere Gleichungen werden auf Vorzeichenwechsel in [-10, 10], dann [-100, 100], dann [-1000, 1000] abgesucht oder per Newton-Verfahren von einem vorgegebenen Punkt aus gelöst.
+
+`js/numeric.js` enthält die reinen Algorithmen: Lanczos-Gamma, `erf`, Aberth-Polynomnullstellen, Nullstellen-Scan und Newton, Richardson-Ableitung, adaptives Gauß-Kronrod-Integral, Miller-Rabin-Primzahltest, Faktorisierung, `toFraction` per Kettenbruch. Sie werden in `test/advanced.test.js` gegen bekannte Werte, ein Sieb und zufällige Identitäten getestet.
 
 ### Numerische Genauigkeit
 
@@ -86,7 +95,7 @@ Hilfsfunktionen: `ew(f)` wendet eine Ein-Zahl-Funktion elementweise an (auf eine
 ## 4. `js/app.js` — die Oberfläche
 
 - **Zustand** — ein einziges Objekt: Ausdruck, letzter Ausdruck, `Ans`, Deg/Rad, Inv, Fn-Seite, Verlauf (bis zu 50 Einträge; die letzten 3 sind sichtbar), Fehlertext.
-- **`PAGES`** — die sechs Fn-Sätze (Trig, Hyp, Mat, Stat, Comb, Rnd); jeder hat 6 Plätze, und ein Platz kann einen `inv`-Ersatz für eingeschaltetes Inv festlegen.
+- **`PAGES`** — die sechzehn Fn-Sätze (Trig, Hyp, Mat, Stat, Comb, Rnd, Alg, Cplx, Calc, Var, Num, Base, Misc, Stat2, Reg, Mat2); jeder hat 6 Plätze, und ein Platz kann einen `inv`-Ersatz für eingeschaltetes Inv festlegen.
 - **`insert(val)`** — der Eingabeschutz. Er verhindert ungültige Folgen beim Tippen: doppelte Operatoren (der letzte ersetzt den vorigen), einen zweiten Dezimalpunkt in einer Zahl, führende `0` vor einer Ziffer, schließende Klammer ohne öffnende, `%`/`!` ohne Operanden, Komma außerhalb von Klammern. Nach `=` beginnt eine Ziffer einen neuen Ausdruck, ein Operator setzt bei `Ans` fort.
 - **`backspace`** löscht einen Funktionsnamen (`sin(`), `Ans` oder `pi` auf einmal; **`calculate`** ruft `CalcEngine.evaluate` auf, führt den Verlauf und zeigt `CalcError`-Meldungen an, ohne die Eingabe zu verlieren.
 - **Modi** — Wissenschaftlich, Einfach, Einheiten, Währungen; der Ausdruck wird von den ersten beiden gemeinsam genutzt.
@@ -100,7 +109,7 @@ Hilfsfunktionen: `ew(f)` wendet eine Ein-Zahl-Funktion elementweise an (auf eine
 
 ```
 npm install     # installiert jsdom (die einzige Entwicklungsabhängigkeit)
-npm test        # node --test "test/*.test.js" — 72 Tests
+npm test        # node --test "test/*.test.js" — 88 Tests
 ```
 
 Es wird der in Node eingebaute Test-Runner verwendet; ein Test-Framework ist nicht nötig.
@@ -108,6 +117,7 @@ Es wird der in Node eingebaute Test-Runner verwendet; ein Test-Framework ist nic
 | Datei | Vorgehen |
 |---|---|
 | `test/engine.test.js` | tabellengetriebene Prüfungen von Arithmetik, Vorrang, Prozent, Fakultät, Konstanten, Trigonometrie in Grad und Bogenmaß, Logarithmen, ggT/kgV/nCr/nPr, Statistik, Matrizen, Formatierung; jede Fehlermeldung; Registerprüfung (jede Funktion hat Argumentbereich und Implementierung); **Fuzzing** — 60 000 zufällige Zeichenketten müssen eine Zahl/Matrix oder einen `CalcError` ergeben, nie eine andere Ausnahme |
+| `test/advanced.test.js` | die höhere Mathematik: numerische Algorithmen gegen bekannte Werte und das Sieb des Eratosthenes, komplexe Identitäten auf Zufallszahlen, `solve`/`diff`/`integral`/`limit`/`sigma`, Zahlentheorie und Zahlensysteme, Statistik, Vektoren und Eigenwerte, Fuzz-Test aller neuen Funktionen |
 | `test/converters.test.js` | typische Umrechnungen, Randfälle der Temperatur, erschöpfende Schleife über alle Einheitenpaare jeder Kategorie (endliche Zahlen, A→B→A ergibt den Ausgangswert), Laden der Kurse mit Ersatzadresse und Fehlern, Diagrammdaten, parallele Historie mit Cache und Lücken, Geldformat — mit einem Schein-`fetch` |
 | `test/ui.test.js` | lädt die echte `index.html` mit allen Skripten in **jsdom** (`test/helpers/dom.js` stellt ein Schein-`fetch` und ein Schein-Canvas bereit) und bedient sie wie ein Benutzer: jede Taste und jeder Fn/Inv-Satz, Fälle des Eingabeschutzes, Verlauf, Genauigkeit, Deg/Rad, Tastatur, Modi, Hilfe, Einheiten, Währungen online/offline; dazu ein **„Affen“-Test** (6000 zufällige Eingaben und Tasten ohne einen einzigen Seitenfehler) und die Prüfung „keine toten Tasten“ |
 | `test/manual.test.js` | analysiert `docs/MANUAL.md`: Beispiele `` `Ausdruck` → **Ergebnis** `` werden von der Engine berechnet, „drücken …“-Beispiele auf der echten Seite ausgeführt, `rad:`- und `units:`-Beispiele nutzen ihren eigenen Modus; geprüft wird auch, dass jede Engine-Funktion und jede Oberflächentaste erwähnt ist und das Handbuch nur auf vorhandene Dateien und Befehle verweist |

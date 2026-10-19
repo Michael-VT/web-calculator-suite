@@ -5,6 +5,7 @@
 Calculatrice scientifique, convertisseur d'unités et de devises dans un seul `index.html`. **Aucune bibliothèque ni police externe** (Internet n'est nécessaire que pour les taux de change), thème clair et sombre, agréable sur téléphone.
 
 - **Scientifique** : trigonométrie (Deg/Rad), fonctions hyperboliques, logarithmes, puissances, pourcentages, factorielle, matrices (`det`, `inv`, `transpose`, …), statistiques, PGCD/PPCM, combinatoire, arrondis ; historique, `Ans`, clavier.
+- **Mathématiques avancées** : nombres complexes (`i`), équations (`solve`), dérivées, intégrales, limites, sommes et produits, régression et loi normale, nombres premiers et factorisation, bases de numération et opérations sur les bits, vecteurs, `lsolve`, `eig`.
 - **Simple** : grandes touches.
 - **Unités** : 12 catégories, dont les unités astronomiques et les anciennes mesures russes.
 - **Devises** : 12 devises, conversion dans les deux sens, graphique du taux, mode hors ligne.
@@ -47,6 +48,7 @@ Les tests s'exécutent à chaque push via GitHub Actions (`.github/workflows/tes
 index.html            page
 css/style.css         mise en forme (thème clair/sombre)
 js/calc-engine.js     analyse et évaluation des expressions (sans DOM)
+js/numeric.js        algorithmes numériques : racines, intégrales, nombres premiers, fonctions spéciales (sans DOM)
 js/converters.js      unités et devises (sans DOM)
 js/app.js             interface
 docs/                 manuel et documents d'architecture

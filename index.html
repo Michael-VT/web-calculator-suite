@@ -190,7 +190,7 @@
         <p><strong>Как пользоваться</strong></p>
         <ul>
           <li>Набирайте выражение кнопками или с клавиатуры (цифры, <code>+ − * / ^ ( ) [ ] , ! %</code>).</li>
-          <li><strong>Fn</strong> (кнопка с названием набора) — переключает функции: Trig → Hyp → Mat → Stat → Comb → Rnd.</li>
+          <li><strong>Fn</strong> (кнопка с названием набора) — переключает функции: Trig → Hyp → Mat → Stat → Comb → Rnd → Alg → Cplx → Calc → Var → Num → Base → Misc → Stat2 → Reg → Mat2.</li>
           <li><strong>Inv</strong> — обратные функции для наборов Trig и Hyp (sin → asin, ln → eˣ, √ → x²).</li>
           <li><strong>Deg / Rad</strong> — углы в градусах или радианах.</li>
           <li><strong>Знаков после запятой</strong> — точность результата.</li>
@@ -240,7 +240,9 @@
           <li>Неявное умножение: <code>2pi</code>, <code>2(3+4)</code></li>
           <li>Нажмите на строку истории — выражение вернётся в ввод</li>
         </ul>
-        <p><strong>Клавиатура</strong>: цифры и <code>+ - * / ^ ( ) [ ] , ! %</code>, <code>Enter</code> или <code>=</code> — вычислить, <code>Esc</code> — AC, <code>Backspace</code> — стереть.</p>
+        <p><strong>Продвинутая математика (наборы Alg … Mat2)</strong>: комплексные числа (<code>i</code>), <code>solve( diff( integral( limit( sigma( product(</code>
+          (переменные <code>x y k t</code> — набор Var), простые числа, системы счисления, регрессия, <code>lsolve( eig(</code>. Подробности — в руководстве.</p>
+        <p><strong>Клавиатура</strong>: цифры и <code>+ - * / ^ ( ) [ ] , ! %</code>, буквы (имена функций; <code>Shift+X</code> — переменная x), <code>Enter</code> или <code>=</code> — вычислить, <code>Esc</code> — AC, <code>Backspace</code> — стереть.</p>
       </div>
     </div>
     <div class="help-nav-row">
@@ -278,6 +280,7 @@
   </div>
 </div>
 
+<script src="js/numeric.js"></script>
 <script src="js/calc-engine.js"></script>
 <script src="js/converters.js"></script>
 <script src="js/app.js"></script>

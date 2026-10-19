@@ -5,6 +5,7 @@
 A scientific calculator, unit converter and currency converter in a single `index.html`. **No external libraries or fonts** (the internet is needed only for exchange rates), light and dark theme, comfortable on a phone.
 
 - **Scientific**: trigonometry (Deg/Rad), hyperbolic functions, logarithms, powers, percentages, factorial, matrices (`det`, `inv`, `transpose`, …), statistics, GCD/LCM, combinatorics, rounding; history, `Ans`, keyboard input.
+- **Advanced math**: complex numbers (`i`), equations (`solve`), derivatives, integrals, limits, sums and products, regression and normal distribution, primes and factoring, number bases and bit operations, vectors, `lsolve`, `eig`.
 - **Simple**: large buttons.
 - **Units**: 12 categories, including astronomical and old Russian measures.
 - **Currencies**: 12 currencies, two-way conversion, rate chart, offline mode.
@@ -47,6 +48,7 @@ Tests run on every push via GitHub Actions (`.github/workflows/test.yml`, Node 2
 index.html            page
 css/style.css         styling (light/dark theme)
 js/calc-engine.js     expression parsing and evaluation (no DOM)
+js/numeric.js        numerical algorithms: roots, integrals, primes, special functions (no DOM)
 js/converters.js      units and currencies (no DOM)
 js/app.js             user interface
 docs/                 manual and architecture documents
