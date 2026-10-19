@@ -1,52 +1,57 @@
-# Calck — калькулятор одной страницей
+# Calck — a one-page calculator
 
-Научный калькулятор, конвертер величин и валют. Один `index.html`, **без внешних библиотек и шрифтов** (интернет нужен только для курсов валют), светлая и тёмная тема, удобен на телефоне.
+**English** · [Português](README-PT.md) · [Українська](README-UK.md) · [Русский](README-RU.md) · [Français](README-FR.md) · [Deutsch](README-DE.md)
 
-- **Научный**: тригонометрия (Deg/Rad), гиперболические функции, логарифмы, степени, проценты, факториал, матрицы (`det`, `inv`, `transpose`, …), статистика, НОД/НОК, комбинаторика, округление; история, `Ans`, клавиатура.
-- **Простой**: крупные кнопки.
-- **Величины**: 12 категорий, включая астрономические и старинные русские меры.
-- **Валюты**: 12 валют, пересчёт в обе стороны, график курса, офлайн-режим.
+A scientific calculator, unit converter and currency converter in a single `index.html`. **No external libraries or fonts** (the internet is needed only for exchange rates), light and dark theme, comfortable on a phone.
 
-## Запуск
+- **Scientific**: trigonometry (Deg/Rad), hyperbolic functions, logarithms, powers, percentages, factorial, matrices (`det`, `inv`, `transpose`, …), statistics, GCD/LCM, combinatorics, rounding; history, `Ans`, keyboard input.
+- **Simple**: large buttons.
+- **Units**: 12 categories, including astronomical and old Russian measures.
+- **Currencies**: 12 currencies, two-way conversion, rate chart, offline mode.
 
-Откройте `index.html` в браузере или `npm start` → http://localhost:8080.
+## Run
 
-## Документация
+Open `index.html` in a browser, or run `npm start` and go to http://localhost:8080.
 
-[**docs/MANUAL.md**](docs/MANUAL.md) — описание каждой кнопки и функции с примерами, которые можно повторить руками.
-Примеры из руководства выполняются в тестах, поэтому всегда соответствуют программе.
+## Documentation
 
-## Тесты
+| Document | Content |
+|---|---|
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | what each file is responsible for, how the functions work, how everything is verified and tested |
+| [docs/MANUAL.md](docs/MANUAL.md) | user manual: every button and function with examples you can repeat by hand (Russian only) |
+
+The architecture document is available in all languages of this README: `docs/ARCHITECTURE-PT.md`, `-UK.md`, `-RU.md`, `-FR.md`, `-DE.md`.
+The examples in `docs/MANUAL.md` are executed by the tests, so the manual always matches the program.
+
+## Tests
 
 ```
 npm install
 npm test
 ```
 
-| Файл | Что проверяет |
+| File | What it checks |
 |---|---|
-| `test/engine.test.js` | движок выражений: арифметика, функции, матрицы, ошибки, форматирование, фаззинг (60 тыс. случайных выражений: только результат или понятная `CalcError`) |
-| `test/converters.test.js` | все пары единиц (обратимость), температура, курсы, даты и кэш графика, сбои сети |
-| `test/ui.test.js` | настоящая страница в jsdom: каждая кнопка и набор Fn/Inv, клавиатура, подсказки, величины, валюты (онлайн/офлайн), «обезьяна» — 6000 случайных нажатий без ошибок |
-| `test/manual.test.js` | выполняет все примеры из `docs/MANUAL.md`, проверяет, что описана каждая функция и кнопка |
+| `test/engine.test.js` | the expression engine: arithmetic, functions, matrices, errors, formatting, fuzzing (60,000 random expressions: only a result or a clear `CalcError`) |
+| `test/converters.test.js` | all unit pairs (reversibility), temperature, rates, dates and chart cache, network failures |
+| `test/ui.test.js` | the real page in jsdom: every button and Fn/Inv set, keyboard, help, units, currencies (online/offline), "monkey" test — 6,000 random presses without errors |
+| `test/manual.test.js` | runs every example from `docs/MANUAL.md` and checks that every function and button is described |
 
-## Структура
+Tests run on every push via GitHub Actions (`.github/workflows/test.yml`, Node 22).
+
+## Structure
 
 ```
-index.html            страница
-css/style.css         оформление (светлая/тёмная тема)
-js/calc-engine.js     разбор и вычисление выражений (без DOM)
-js/converters.js      величины и валюты (без DOM)
-js/app.js             интерфейс
-docs/MANUAL.md        руководство
-test/                 тесты
-variants/             прежние варианты страниц (история поиска; не используются)
+index.html            page
+css/style.css         styling (light/dark theme)
+js/calc-engine.js     expression parsing and evaluation (no DOM)
+js/converters.js      units and currencies (no DOM)
+js/app.js             user interface
+docs/                 manual and architecture documents
+test/                 tests
+variants/             earlier versions of the page (kept for history)
 ```
 
-## Что изменено по сравнению с `calculatorEF.html`
+## License
 
-Исправлены ошибки исходной версии: зависимость от math.js и Google Fonts; `Inv` подменял функции регулярными выражениями
-(ломал вложенные вызовы); `log` в подсказке был десятичным, а работал как натуральный; «Enter» повторно нажимал
-сфокусированную кнопку; `tan(90)` и деление на ноль давали «Infinity» или странные значения; ошибка стирала ввод;
-данные («КБ») считались как биты; график валют запрашивал сеть при каждом изменении размера окна и делал до 25
-последовательных запросов; старинные меры были округлены неточно и несогласованно. Добавлены тесты и руководство.
+MIT (see `package.json`).
