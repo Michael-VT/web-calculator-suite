@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Мануал и тесты калькулятора</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f7fa;
+  --card: #ffffff;
+  --accent: #1a73e8;
+  --ok: #0d652d;
+  --border: #dadce0;
+  --text: #202124;
+  --muted: #5f6368;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: 'Roboto', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+  padding: 20px;
+  line-height: 1.55;
+}
+.wrap {
+  max-width: 860px;
+  margin: 0 auto;
+}
+h1 {
+  font-weight: 500;
+  font-size: 28px;
+  margin-bottom: 6px;
+}
+.subtitle {
+  color: var(--muted);
+  margin-bottom: 28px;
+}
+.level {
+  background: var(--card);
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.level-header {
+  background: #e8f0fe;
+  padding: 14px 20px;
+  font-weight: 500;
+  font-size: 18px;
+  color: var(--accent);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.level-body { padding: 8px 0 16px; }
+.test {
+  padding: 14px 20px;
+  border-bottom: 1px solid #f1f3f4;
+}
+.test:last-child { border-bottom: none; }
+.test-title {
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.steps {
+  margin: 6px 0 8px;
+  padding-left: 18px;
+  color: var(--text);
+}
+.expected {
+  background: #e6f4ea;
+  border-left: 4px solid var(--ok);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-family: ui-monospace, monospace;
+  font-size: 14px;
+  margin-top: 6px;
+}
+.note {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.badge {
+  background: var(--accent);
+  color: white;
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+.toc {
+  background: white;
+  border-radius: 16px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+}
+.toc a {
+  color: var(--accent);
+  text-decoration: none;
+  margin-right: 16px;
+  font-size: 14px;
+}
+.toc a:hover { text-decoration: underline; }
+footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 32px;
+}
+code {
+  background: #f1f3f4;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: ui-monospace, monospace;
+  font-size: 0.95em;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Мануал и проверочные тесты</h1>
+  <p class="subtitle">Самостоятельная страница. Откройте калькулятор рядом и проходите тесты по порядку — от простого к сложному. Так вы быстро поймёте все возможности и убедитесь, что всё работает.</p>
+
+  <div class="toc">
+    <strong>Содержание:</strong><br>
+    <a href="#l1">1. Базовые операции</a>
+    <a href="#l2">2. Точность и история</a>
+    <a href="#l3">3. Тригонометрия</a>
+    <a href="#l4">4. Логарифмы и корни</a>
+    <a href="#l5">5. Матрицы</a>
+    <a href="#l6">6. Статистика и теория чисел</a>
+    <a href="#l7">7. Величины</a>
+    <a href="#l8">8. Валюты</a>
+    <a href="#l9">9. Сложные комбинированные</a>
+  </div>
+
+  <!-- Level 1 -->
+  <div class="level" id="l1">
+    <div class="level-header">Уровень 1 — Базовые операции <span class="badge">Простой</span></div>
+    <div class="level-body">
+      <div class="test">
+        <div class="test-title">1.1 Сложение и умножение</div>
+        <ol class="steps">
+          <li>Перейдите в режим <strong>Научный</strong> или <strong>Простой</strong>.</li>
+          <li>Введите: <code>12 + 34</code> → <code>=</code></li>
+          <li>Затем: <code>7 × 8</code> → <code>=</code></li>
+        </ol>
+        <div class="expected">Ожидается: 46 и 56</div>
+      </div>
+      <div class="test">
+        <div class="test-title">1.2 Скобки и приоритет</div>
+        <ol class="steps">
+          <li>Введите: <code>(2 + 3) × 4</code> → <code>=</code></li>
+          <li>Сравните с <code>2 + 3 × 4</code></li>
+        </ol>
+        <div class="expected">Ожидается: 20 и 14</div>
+      </div>
+      <div class="test">
+        <div class="test-title">1.3 Степень и EXP</div>
+        <ol class="steps">
+          <li><code>2 xʸ 10</code> → <code>=</code></li>
+          <li><code>5 EXP 3</code> → <code>=</code> (это 5×10³)</li>
+        </ol>
+        <div class="expected">Ожидается: 1024 и 5000</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Level 2 -->
+  <div class="level" id="l2">
+    <div class="level-header">Уровень 2 — Точность и история <span class="badge">Простой</span></div>
+    <div class="level-body">
+      <div class="test">
+        <div class="test-title">2.1 Выбор точности</div>
+        <ol class="steps">
+          <li>В научном режиме найдите селектор <strong>Точность</strong>.</li>
+          <li>Вычислите <code>1 ÷ 3</code></li>
+          <li>Переключите точность на «2 знака», затем на «10 знаков».</li>
+        </ol>
+        <div class="expected">При 2 знаках ≈ 0.33, при 10 — больше цифр после запятой.</div>
+        <div class="note">Результат переформатируется сразу.</div>
+      </div>
+      <div class="test">
+        <div class="test-title">2.2 История операций</div>
+        <ol class="steps">
+          <li>Выполните подряд: <code>10 + 5 =</code>, затем <code>20 × 3 =</code></li>
+          <li>Посмотрите мелкий текст над большим результатом.</li>
+        </ol>
+        <div class="expected">Должны быть видны две последние строки вида «10+5 = 15» и «20×3 = 60».</div>
+      </div>
+      <div class="test">
+        <div class="test-title">2.3 Кнопка Ans</div>
+        <ol class="steps">
+          <li>Вычислите что-нибудь, например <code>100 ÷ 4 =</code></li>
+          <li>Нажмите <strong>Ans</strong>, затем <code>× 2 =</code></li>
+        </ol>
+        <div class="expected">Должно получиться 50.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Level 3 -->
+  <div class="level" id="l3">
+    <div class="level-header">Уровень 3 — Тригонометрия <span class="badge">Средний</span></div>
+    <div class="level-body">
+      <div class="test">
+        <div class="test-title">3.1 Градусы (Deg)</div>
+        <ol class="steps">
+          <li>Убедитесь, что активен режим <strong>Deg</strong>.</li>
+          <li><code>sin(30) =</code></li>
+          <li><code>cos(60) =</code></li>
+          <li><code>tan(45) =</code></li>
+        </ol>
+        <div class="expected">0.5 , 0.5 , 1</div>
+      </div>
+      <div class="test">
+        <div class="test-title">3.2 Обратные функции (atan и др.)</div>
+        <ol class="steps">
+          <li>Нажмите <strong>Fn</strong>, пока не появится набор <strong>Inv</strong> (или используйте постоянные кнопки asin/atan/acos).</li>
+          <li><code>asin(0.5) =</code></li>
+          <li><code>atan(1) =</code></li>
+          <li><code>acos(0.5) =</code></li>
+        </ol>
+        <div class="expected">30 , 45 , 60 (в режиме Deg)</div>
+      </div>
+      <div class="test">
+        <div class="test-title">3.3 Переключение Deg / Rad</div>
+        <ol class="steps">
+          <li>Переключите на <strong>Rad</strong>.</li>
+          <li>Вычислите <code>sin(pi/2) =</code></li>
+        </ol>
+        <div class="expected">1</div>
+        <div class="note">Не забудьте вернуть Deg, если нужно.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Level 4 -->
+  <div class="level" id="l4">
+    <div class="level-header">Уровень 4 — Логарифмы и корни <span class="badge">Средний</span></div>
+    <div class="level-body">
+      <div class="test">
+        <div class="test-title">4.1 Корни и логарифмы</div>
+        <ol class="steps">
+          <li><code>sqrt(16) =</code> или кнопка √</li>
+          <li><code>cbrt(27) =</code> (режим Inv или More)</li>
+          <li><code>ln(e) =</code></li>
+          <li><code>log10(1000) =</code></li>
+        </ol>
+        <div class="expected">4 , 3 , 1 , 3</div>
+      </div>
+      <div class="test">
+        <div class="test-title">4.2 Гиперболические (режим More)</div>
+        <ol class="steps">
+          <li>Переключите <strong>Fn</strong> на набор <strong>More</strong>.</li>
+          <li><code>sinh(0) =</code>, <code>cosh(0) =</code></li>
+        </ol>
+        <div class="expected">0 и 1</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Level 5 -->
+  <div class="level" id="l5">
+    <div class="level-header">Уровень 5 — Матрицы <span class="badge">Продвинутый</span></div>
+    <div class="level-body">
+      <div class="test">
+        <div class="test-title">5.1 Определитель</div>
+        <ol class="steps">
+          <li>Переключите <strong>Fn</strong> на <strong>Mat</strong> или используйте постоянные кнопки det, [, ], ,</li>
+          <li>Введите: <code>det([[1,2],[3,4]])</code></li>
+          <li>Нажмите <code>=</code></li>
+        </ol>
+        <div class="expected">−2</div>
+      </div>
+      <div class="test">
+        <div class="test-title">5.2 Обратная матрица и след</div>
+        <ol class="steps">
+          <li><code>inv([[1,2],[3,4]])</code> → <code>=</code> (посмотрите результат)</li>
+          <li><code>trace([[1,2],[3,4]]) =</code></li>
+        </ol>
+        <div class="expected">trace = 5. Обратная матрица будет матрицей чисел.</div>
+      </div>
+      <div class="test">
+        <div class="test-title">5.3 Единичная матрица</div>
+        <ol class="steps">
+          <li><code>eye(3) =</code></li>
+        </ol>
+        <div class="expected">Единичная матрица 3×3</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Level 6 -->
+  <div class="level" id="l6">
+    <div class="level-header">Уровень 6 — Статистика и теория чисел <span class="badge">Продвинутый</span></div>
+    <div class="level-body">
+      <div class="test">
+        <div class="test-title">6.1 Среднее и факториал</div>
+        <ol class="steps">
+          <li>Режим <strong>Stat</strong> или постоянные кнопки.</li>
+          <li><code>mean([1,2,3,4,5]) =</code></li>
+          <li><code>factorial(5) =</code> или <code>5!</code></li>
+        </ol>
+        <div class="expected">3 и 120</div>
+      </div>
+      <div class="test">
+        <div class="test-title">6.2 НОД и НОК</div>
+        <ol class="steps">
+          <li><code>gcd(12,18) =</code></li>
+          <li><code>lcm(12,18) =</code></li>
+        </ol>
+        <div class="expected">6 и 36</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Level 7 -->
+  <div class="level" id="l7">
+    <div class="level-header">Уровень 7 — Перевод величин <span class="badge">Отдельный режим</span></div>
+    <div class="level-body">
+      <div class="test">
+        <div class="test-title">7.1 Длина</div>
+        <ol class="steps">
+          <li>Перейдите на вкладку <strong>Величины</strong>.</li>
+          <li>Категория: Длина. Значение: 1. Из: метр → В: км</li>
+        </ol>
+        <div class="expected">0.001 км</div>
+      </div>
+      <div class="test">
+        <div class="test-title">7.2 Температура</div>
+        <ol class="steps">
+          <li>Категория: Температура. 0 °C → °F</li>
+          <li>100 °C → °F</li>
+        </ol>
+        <div class="expected">32 °F и 212 °F</div>
+      </div>
+      <div class="test">
+        <div class="test-title">7.3 Масса и объём</div>
+        <ol class="steps">
+          <li>1 кг → г</li>
+          <li>1 л → мл</li>
+        </ol>
+        <div class="expected">1000 г и 1000 мл</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Level 8 -->
+  <div class="level" id="l8">
+    <div class="level-header">Уровень 8 — Валюты <span class="badge">Отдельный режим</span></div>
+    <div class="level-body">
+      <div class="test">
+        <div class="test-title">8.1 Двусторонний пересчёт</div>
+        <ol class="steps">
+          <li>Вкладка <strong>Валюты</strong>.</li>
+          <li>Введите 100 в верхнее поле, выберите USD → UAH.</li>
+          <li>Измените нижнее поле — верхнее должно пересчитаться.</li>
+        </ol>
+        <div class="expected">Оба поля обновляются автоматически. Крупный результат сверху.</div>
+      </div>
+      <div class="test">
+        <div class="test-title">8.2 График истории</div>
+        <ol class="steps">
+          <li>Выберите пару, например PLN → USD.</li>
+          <li>Переключайте периоды: 1Д, 5Д, 1М, 3М, 1Г.</li>
+        </ol>
+        <div class="expected">График перерисовывается. Под ним — подпись периода.</div>
+        <div class="note">Нужен интернет. При отсутствии сети — примерные курсы.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Level 9 -->
+  <div class="level" id="l9">
+    <div class="level-header">Уровень 9 — Сложные комбинированные <span class="badge">Эксперт</span></div>
+    <div class="level-body">
+      <div class="test">
+        <div class="test-title">9.1 Комбинация функций</div>
+        <ol class="steps">
+          <li><code>sin(atan(1)*2) =</code> (Deg)</li>
+          <li><code>sqrt(2^2 + 3^2) =</code></li>
+        </ol>
+        <div class="expected">1 и ≈3.6056</div>
+      </div>
+      <div class="test">
+        <div class="test-title">9.2 Матрица + число</div>
+        <ol class="steps">
+          <li><code>det([[1,0],[0,1]]) * 10 =</code></li>
+          <li><code>mean([1,2,3]) + factorial(3) =</code></li>
+        </ol>
+        <div class="expected">10 и 8</div>
+      </div>
+      <div class="test">
+        <div class="test-title">9.3 Проверка подсказки</div>
+        <ol class="steps">
+          <li>Нажмите кнопку <strong>?</strong> рядом с точностью.</li>
+          <li>Пролистайте все 4 страницы подсказки.</li>
+          <li>Проверьте «?» в режимах Величины и Валюты.</li>
+        </ol>
+        <div class="expected">Подсказки открываются, страницы переключаются, закрываются по кнопке или клику вне окна.</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Мануал создан для удобного освоения и проверки калькулятора.<br>
+    Проходите уровни по порядку — так быстрее всего освоите все возможности.
+  </footer>
+</div>
+</body>
+</html>

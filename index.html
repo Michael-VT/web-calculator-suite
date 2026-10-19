@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Калькулятор</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="container">
+  <div class="modes" role="tablist" aria-label="Режим">
+    <button class="mode-btn active" role="tab" aria-selected="true" data-mode="scientific">Научный</button>
+    <button class="mode-btn" role="tab" aria-selected="false" data-mode="units">Величины</button>
+    <button class="mode-btn" role="tab" aria-selected="false" data-mode="simple">Простой</button>
+    <button class="mode-btn" role="tab" aria-selected="false" data-mode="currency">Валюты</button>
+  </div>
+
+  <!-- Дисплей: общий для научного и простого режимов -->
+  <div class="display-area" id="calc-display">
+    <div class="precision-bar" id="precision-bar">
+      <label for="precision-select">Знаков после запятой:</label>
+      <select id="precision-select">
+        <option value="2">2</option>
+        <option value="4">4</option>
+        <option value="6" selected>6</option>
+        <option value="8">8</option>
+        <option value="10">10</option>
+        <option value="14">14 (макс.)</option>
+      </select>
+      <button class="help-btn" id="help-sci" title="Подсказка" aria-label="Подсказка">?</button>
+    </div>
+    <div class="history-lines" id="history-lines" aria-label="История"></div>
+    <div id="expression"></div>
+    <div id="display" aria-live="polite">0</div>
+    <div id="error-msg" role="alert"></div>
+  </div>
+
+  <!-- Научная клавиатура -->
+  <div class="buttons sci-grid" id="scientific-btns">
+    <button class="btn func" id="btn-deg" data-action="deg" title="Градусы / радианы">Deg</button>
+    <button class="btn func special" id="btn-fn" data-action="fnmode" title="Переключить набор функций">Trig</button>
+    <button class="btn func" data-val="(">(</button>
+    <button class="btn func" data-val=")">)</button>
+    <button class="btn func" data-val="%">%</button>
+    <button class="btn ac" data-action="ac">AC</button>
+    <button class="btn func" data-action="back" aria-label="Стереть">⌫</button>
+
+    <button class="btn func" id="btn-inv" data-action="inv" title="Обратные функции" aria-pressed="false">Inv</button>
+    <button class="btn func" data-slot="0"></button>
+    <button class="btn func" data-slot="1"></button>
+    <button class="btn" data-val="7">7</button>
+    <button class="btn" data-val="8">8</button>
+    <button class="btn" data-val="9">9</button>
+    <button class="btn op" data-val="/" aria-label="Разделить">÷</button>
+
+    <button class="btn func const" data-val="pi">π</button>
+    <button class="btn func" data-slot="2"></button>
+    <button class="btn func" data-slot="3"></button>
+    <button class="btn" data-val="4">4</button>
+    <button class="btn" data-val="5">5</button>
+    <button class="btn" data-val="6">6</button>
+    <button class="btn op" data-val="*" aria-label="Умножить">×</button>
+
+    <button class="btn func const" data-val="e">e</button>
+    <button class="btn func" data-slot="4"></button>
+    <button class="btn func" data-slot="5"></button>
+    <button class="btn" data-val="1">1</button>
+    <button class="btn" data-val="2">2</button>
+    <button class="btn" data-val="3">3</button>
+    <button class="btn op" data-val="-" aria-label="Вычесть">−</button>
+
+    <button class="btn func" data-val="Ans" title="Предыдущий результат">Ans</button>
+    <button class="btn func" data-val="E" title="Умножить на 10 в степени">EXP</button>
+    <button class="btn func" data-val="^" title="Возведение в степень">xʸ</button>
+    <button class="btn" data-val="0">0</button>
+    <button class="btn" data-val=".">.</button>
+    <button class="btn eq" data-action="eq">=</button>
+    <button class="btn op" data-val="+">+</button>
+
+    <button class="btn func matrix" data-val="[">[</button>
+    <button class="btn func matrix" data-val="]">]</button>
+    <button class="btn func special" data-val=",">,</button>
+    <button class="btn func" data-val="^2">x²</button>
+    <button class="btn func" data-val="^(-1)">x⁻¹</button>
+    <button class="btn func stat" data-val="!">n!</button>
+    <button class="btn func" data-val="abs(">abs</button>
+  </div>
+
+  <!-- Простая клавиатура -->
+  <div class="buttons simple-grid" id="simple-btns" style="display:none">
+    <button class="btn ac" data-action="ac">AC</button>
+    <button class="btn func" data-action="back" aria-label="Стереть">⌫</button>
+    <button class="btn func" data-val="%">%</button>
+    <button class="btn op" data-val="/" aria-label="Разделить">÷</button>
+
+    <button class="btn" data-val="7">7</button>
+    <button class="btn" data-val="8">8</button>
+    <button class="btn" data-val="9">9</button>
+    <button class="btn op" data-val="*" aria-label="Умножить">×</button>
+
+    <button class="btn" data-val="4">4</button>
+    <button class="btn" data-val="5">5</button>
+    <button class="btn" data-val="6">6</button>
+    <button class="btn op" data-val="-" aria-label="Вычесть">−</button>
+
+    <button class="btn" data-val="1">1</button>
+    <button class="btn" data-val="2">2</button>
+    <button class="btn" data-val="3">3</button>
+    <button class="btn op" data-val="+">+</button>
+
+    <button class="btn wide" data-val="0">0</button>
+    <button class="btn" data-val=".">.</button>
+    <button class="btn eq" data-action="eq">=</button>
+  </div>
+
+  <!-- Величины -->
+  <div class="panel" id="units-panel">
+    <div class="panel-header">
+      <h3>Перевод величин</h3>
+      <button class="help-btn" id="help-units" title="Подсказка" aria-label="Подсказка">?</button>
+    </div>
+    <div class="row">
+      <label for="unit-category">Категория</label>
+      <select id="unit-category"></select>
+    </div>
+    <div class="row">
+      <label for="unit-value">Значение</label>
+      <input type="number" id="unit-value" value="1" step="any" inputmode="decimal">
+    </div>
+    <div class="unit-row row">
+      <select id="unit-from" aria-label="Из"></select>
+      <button class="swap-btn" id="unit-swap" title="Поменять местами" aria-label="Поменять местами">⇄</button>
+      <select id="unit-to" aria-label="В"></select>
+    </div>
+    <div class="result-box" id="unit-result" aria-live="polite">1</div>
+  </div>
+
+  <!-- Валюты -->
+  <div class="panel" id="currency-panel">
+    <div class="panel-header">
+      <h3>Курсы валют</h3>
+      <button class="help-btn" id="help-curr" title="Подсказка" aria-label="Подсказка">?</button>
+    </div>
+    <div class="currency-header" id="curr-header"></div>
+    <div class="currency-result" id="curr-big-result"></div>
+    <div class="currency-meta">
+      <span id="rates-date">Загрузка курсов...</span>
+      <button class="link-btn" id="refresh-rates">Обновить</button>
+    </div>
+
+    <div class="currency-inputs">
+      <div class="currency-input-row">
+        <input type="number" id="curr-amount" value="100" step="any" inputmode="decimal" aria-label="Сумма">
+        <select id="curr-from" aria-label="Из валюты"></select>
+      </div>
+      <div class="swap-line"><button class="swap-btn" id="curr-swap" title="Поменять местами" aria-label="Поменять валюты местами">⇅</button></div>
+      <div class="currency-input-row">
+        <input type="number" id="curr-result-input" value="" step="any" inputmode="decimal" placeholder="0" aria-label="Результат">
+        <select id="curr-to" aria-label="В валюту"></select>
+      </div>
+    </div>
+
+    <div class="chart-container" id="chart-container">
+      <div class="chart-periods" id="chart-periods">
+        <button data-days="7" class="active">7Д</button>
+        <button data-days="30">1М</button>
+        <button data-days="90">3М</button>
+        <button data-days="180">6М</button>
+        <button data-days="365">1Г</button>
+      </div>
+      <canvas id="rate-chart"></canvas>
+      <div class="chart-info" id="chart-info">График курса</div>
+    </div>
+
+    <table class="rates-table" id="rates-table">
+      <thead><tr><th>Валюта</th><th>Курс к USD</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="footer">Калькулятор • научный, величины, валюты • работает офлайн</div>
+</div>
+
+<!-- Подсказки -->
+<div class="help-modal" id="modal-sci" role="dialog" aria-modal="true" aria-labelledby="sci-help-title">
+  <div class="help-content">
+    <h3 id="sci-help-title">Научный калькулятор — стр. 1/4</h3>
+    <div id="sci-help-pages">
+      <div class="sci-page" data-page="1">
+        <p><strong>Как пользоваться</strong></p>
+        <ul>
+          <li>Набирайте выражение кнопками или с клавиатуры (цифры, <code>+ − * / ^ ( ) [ ] , ! %</code>).</li>
+          <li><strong>Fn</strong> (кнопка с названием набора) — переключает функции: Trig → Hyp → Mat → Stat → Comb → Rnd.</li>
+          <li><strong>Inv</strong> — обратные функции для наборов Trig и Hyp (sin → asin, ln → eˣ, √ → x²).</li>
+          <li><strong>Deg / Rad</strong> — углы в градусах или радианах.</li>
+          <li><strong>Знаков после запятой</strong> — точность результата.</li>
+          <li><strong>AC</strong> — полный сброс, <strong>⌫</strong> — стереть последний символ или функцию, <strong>Ans</strong> — прошлый результат.</li>
+        </ul>
+        <p><strong>Основные кнопки</strong></p>
+        <ul>
+          <li><code>%</code> — процент: <code>50%</code> = 0.5, а <code>200+10%</code> = 220</li>
+          <li><code>EXP</code> — запись «× 10ⁿ»: <code>5 EXP 3</code> = 5000</li>
+          <li><code>xʸ</code> — степень, <code>x²</code>, <code>x⁻¹</code> — квадрат и обратное число</li>
+          <li><code>π</code>, <code>e</code> — константы; <code>n!</code> — факториал</li>
+        </ul>
+      </div>
+      <div class="sci-page" data-page="2" style="display:none">
+        <p><strong>Тригонометрия, логарифмы, корни</strong></p>
+        <ul>
+          <li><code>sin( cos( tan(</code> и обратные <code>asin( acos( atan(</code>; <code>atan2(y, x)</code></li>
+          <li><code>sinh( cosh( tanh(</code> и <code>asinh( acosh( atanh(</code></li>
+          <li><code>ln(</code> — натуральный, <code>log(</code> — десятичный, <code>log2(</code> — двоичный, <code>log(x, основание)</code></li>
+          <li><code>sqrt(</code> (√) — квадратный корень, <code>cbrt(</code> — кубический</li>
+        </ul>
+        <p>Пример: <code>sin(30)</code> в режиме Deg = 0.5</p>
+      </div>
+      <div class="sci-page" data-page="3" style="display:none">
+        <p><strong>Матрицы (набор Mat)</strong></p>
+        <ul>
+          <li><code>det(</code> — определитель, <code>inv(</code> — обратная матрица</li>
+          <li><code>transpose(</code> — транспонирование, <code>trace(</code> — след</li>
+          <li><code>eye(n)</code> — единичная матрица, <code>size(</code> — размер</li>
+          <li><code>[</code> <code>]</code> <code>,</code> — ввод матриц: <code>[[1,2],[3,4]]</code></li>
+          <li>Матрицы можно складывать, умножать (<code>*</code>), возводить в целую степень</li>
+        </ul>
+        <p>Пример: <code>det([[1,2],[3,4]])</code> = −2</p>
+        <p><strong>Статистика (Stat)</strong>: <code>mean median sum std min max</code>, а также <code>stdp(</code>.</p>
+        <p>Пример: <code>mean([1,2,3,4])</code> = 2.5</p>
+      </div>
+      <div class="sci-page" data-page="4" style="display:none">
+        <p><strong>Числа и округление (Comb, Rnd)</strong></p>
+        <ul>
+          <li><code>gcd( lcm( mod( nCr( nPr( hypot(</code></li>
+          <li><code>round( floor( ceil( trunc( sign( abs(</code></li>
+        </ul>
+        <p><strong>Советы</strong></p>
+        <ul>
+          <li>Функции можно вкладывать: <code>sin(atan(1)*2)</code></li>
+          <li>Незакрытые скобки закрываются сами: <code>sqrt(16</code> = 4</li>
+          <li>Неявное умножение: <code>2pi</code>, <code>2(3+4)</code></li>
+          <li>Нажмите на строку истории — выражение вернётся в ввод</li>
+        </ul>
+        <p><strong>Клавиатура</strong>: цифры и <code>+ - * / ^ ( ) [ ] , ! %</code>, <code>Enter</code> или <code>=</code> — вычислить, <code>Esc</code> — AC, <code>Backspace</code> — стереть.</p>
+      </div>
+    </div>
+    <div class="help-nav-row">
+      <button class="help-nav" id="sci-prev">← Назад</button>
+      <button class="help-nav primary" id="sci-next">Далее →</button>
+    </div>
+    <button class="help-close" data-close="modal-sci">Закрыть</button>
+  </div>
+</div>
+
+<div class="help-modal" id="modal-units" role="dialog" aria-modal="true" aria-label="Подсказка: величины">
+  <div class="help-content">
+    <h3>Перевод величин</h3>
+    <ul>
+      <li>Выберите категорию (длина, масса, температура и др.).</li>
+      <li>Введите значение и единицы «из» и «в»; кнопка ⇄ меняет их местами.</li>
+      <li>Результат пересчитывается автоматически.</li>
+      <li><strong>Астрономические</strong>: а.е., световой год, парсек, радиусы Земли и Солнца.</li>
+      <li><strong>Старинные</strong>: верста, сажень, аршин, пядь, вершок; десятина; пуд, фунт, золотник, лот.</li>
+    </ul>
+    <button class="help-close" data-close="modal-units">Закрыть</button>
+  </div>
+</div>
+
+<div class="help-modal" id="modal-curr" role="dialog" aria-modal="true" aria-label="Подсказка: валюты">
+  <div class="help-content">
+    <h3>Курсы валют</h3>
+    <ul>
+      <li>Введите сумму в верхнем или нижнем поле — пересчёт идёт в обе стороны.</li>
+      <li>Кнопка ⇅ меняет валюты местами, «Обновить» перезагружает курсы.</li>
+      <li>График показывает историю курса за выбранный период (7Д, 1М, 3М, 6М, 1Г); коснитесь графика, чтобы увидеть значение.</li>
+      <li>Курсы загружаются из открытого источника; без интернета используются приблизительные значения.</li>
+    </ul>
+    <button class="help-close" data-close="modal-curr">Закрыть</button>
+  </div>
+</div>
+
+<script src="js/calc-engine.js"></script>
+<script src="js/converters.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

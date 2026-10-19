@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Удобный калькулятор</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f7fa;
+  --card: #ffffff;
+  --btn-func: #e8eefc;
+  --btn-num: #f8f9fb;
+  --btn-op: #e8eefc;
+  --btn-eq: #1a73e8;
+  --btn-eq-hover: #1557b0;
+  --text: #202124;
+  --text-light: #5f6368;
+  --border: #dadce0;
+  --radius: 24px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Roboto', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 12px;
+}
+.container {
+  width: 100%;
+  max-width: 480px;
+  background: var(--card);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.modes {
+  display: flex;
+  background: #f1f3f4;
+  padding: 8px;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+.mode-btn {
+  flex: 1;
+  min-width: 90px;
+  padding: 10px 8px;
+  border: none;
+  background: transparent;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-light);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.mode-btn.active {
+  background: white;
+  color: #1a73e8;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+.precision-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 4px 20px 0;
+  font-size: 13px;
+  color: var(--text-light);
+}
+.precision-bar select {
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: white;
+  font-size: 13px;
+}
+.history-lines {
+  font-size: 14px;
+  color: var(--text-light);
+  line-height: 1.4;
+  min-height: 40px;
+  margin-bottom: 6px;
+  word-break: break-all;
+}
+.history-lines div {
+  opacity: 0.75;
+}
+#expression {
+  font-size: 16px;
+  color: var(--text-light);
+  min-height: 22px;
+  word-break: break-all;
+  margin-bottom: 2px;
+}
+#display {
+  font-size: 42px;
+  font-weight: 400;
+  letter-spacing: -1px;
+  line-height: 1.1;
+  word-break: break-all;
+}
+.buttons {
+  padding: 8px;
+  display: grid;
+  gap: 8px;
+}
+.sci-grid {
+  grid-template-columns: repeat(7, 1fr);
+}
+.simple-grid {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  padding: 12px;
+}
+.btn {
+  border: none;
+  border-radius: 22px;
+  font-size: 18px;
+  font-weight: 500;
+  padding: 14px 4px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.05s;
+  background: var(--btn-num);
+  color: var(--text);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active { transform: scale(0.96); }
+.btn.func { background: var(--btn-func); color: #1a73e8; font-weight: 500; }
+.btn.op { background: var(--btn-op); color: #1a73e8; }
+.btn.eq { background: var(--btn-eq); color: white; font-size: 22px; }
+.btn.eq:hover { background: var(--btn-eq-hover); }
+.btn.ac { color: #d93025; }
+.btn.wide { grid-column: span 2; }
+.simple-grid .btn {
+  font-size: 28px;
+  padding: 22px 8px;
+  border-radius: 28px;
+  min-height: 72px;
+}
+.panel {
+  padding: 16px;
+  display: none;
+}
+.panel.active { display: block; }
+.row { margin-bottom: 14px; }
+label { display: block; font-size: 14px; color: var(--text-light); margin-bottom: 6px; }
+input[type="number"], select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 16px;
+  background: white;
+}
+.unit-row, .curr-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.unit-row select, .curr-row select { flex: 1; }
+.result-box {
+  background: #e8f0fe;
+  border-radius: 16px;
+  padding: 16px;
+  text-align: center;
+  margin-top: 12px;
+  font-size: 22px;
+  font-weight: 500;
+}
+.currency-header {
+  font-size: 15px;
+  color: var(--text-light);
+  margin-bottom: 6px;
+}
+.currency-result {
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 1.15;
+  margin-bottom: 4px;
+}
+.currency-result .amount {
+  background: #d2e3fc;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+.currency-result .currency-name {
+  font-size: 28px;
+  font-weight: 400;
+}
+.currency-meta {
+  font-size: 12px;
+  color: #9aa0a6;
+  margin-bottom: 16px;
+}
+.currency-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.currency-input-row {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: white;
+}
+.currency-input-row input {
+  flex: 1;
+  border: none;
+  padding: 14px 16px;
+  font-size: 18px;
+  outline: none;
+  min-width: 0;
+}
+.currency-input-row select {
+  border: none;
+  border-left: 1px solid var(--border);
+  padding: 14px 12px;
+  font-size: 15px;
+  background: #f8f9fb;
+  cursor: pointer;
+  max-width: 48%;
+}
+.chart-container {
+  margin-top: 16px;
+  background: white;
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+}
+.chart-periods {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.chart-periods button {
+  padding: 6px 12px;
+  border: none;
+  background: #f1f3f4;
+  border-radius: 16px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--text-light);
+}
+.chart-periods button.active {
+  background: #1a73e8;
+  color: white;
+}
+#rate-chart {
+  width: 100%;
+  height: 160px;
+  background: #fafafa;
+  border-radius: 8px;
+}
+.chart-info {
+  font-size: 12px;
+  color: #9aa0a6;
+  margin-top: 6px;
+  text-align: center;
+}
+.footer {
+  text-align: center;
+  padding: 12px;
+  font-size: 12px;
+  color: #9aa0a6;
+  border-top: 1px solid var(--border);
+}
+@media (min-width: 600px) {
+  .container { margin: 20px auto; }
+  .btn { padding: 16px 4px; font-size: 20px; }
+  .simple-grid .btn { min-height: 80px; font-size: 32px; }
+  #display { font-size: 48px; }
+}
+@media (max-width: 400px) {
+  .sci-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+  .btn { font-size: 15px; padding: 12px 2px; border-radius: 18px; }
+  #display { font-size: 32px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="modes">
+    <button class="mode-btn active" data-mode="scientific">Научный</button>
+    <button class="mode-btn" data-mode="units">Величины</button>
+    <button class="mode-btn" data-mode="simple">Простой</button>
+    <button class="mode-btn" data-mode="currency">Валюты</button>
+  </div>
+
+  <!-- Scientific & Simple share display -->
+  <div class="display-area" id="calc-display">
+    <div class="precision-bar" id="precision-bar">
+      <span>Точность:</span>
+      <select id="precision-select">
+        <option value="2">2 знака</option>
+        <option value="4">4 знака</option>
+        <option value="6" selected>6 знаков</option>
+        <option value="8">8 знаков</option>
+        <option value="10">10 знаков</option>
+        <option value="14">Макс. (14)</option>
+      </select>
+    </div>
+    <div class="history-lines" id="history-lines"></div>
+    <div id="expression"></div>
+    <div id="display">0</div>
+  </div>
+
+  <!-- Scientific buttons -->
+  <div class="buttons sci-grid" id="scientific-btns">
+    <!-- Row 1 -->
+    <button class="btn func" data-action="deg">Deg</button>
+    <button class="btn func" id="fn-mode-btn" data-action="fnmode">Fn</button>
+    <button class="btn func" data-val="(">(</button>
+    <button class="btn func" data-val=")">)</button>
+    <button class="btn func" data-val="%">%</button>
+    <button class="btn ac" data-action="ac">AC</button>
+    <button class="btn func" data-action="back">⌫</button>
+
+    <!-- Row 2 -->
+    <button class="btn func" id="f1" data-action="inv">Inv</button>
+    <button class="btn func" id="f2" data-val="sin(">sin</button>
+    <button class="btn func" id="f3" data-val="ln(">ln</button>
+    <button class="btn" data-val="7">7</button>
+    <button class="btn" data-val="8">8</button>
+    <button class="btn" data-val="9">9</button>
+    <button class="btn op" data-val="/">÷</button>
+
+    <!-- Row 3 -->
+    <button class="btn func" id="f4" data-val="pi">π</button>
+    <button class="btn func" id="f5" data-val="cos(">cos</button>
+    <button class="btn func" id="f6" data-val="log10(">log</button>
+    <button class="btn" data-val="4">4</button>
+    <button class="btn" data-val="5">5</button>
+    <button class="btn" data-val="6">6</button>
+    <button class="btn op" data-val="*">×</button>
+
+    <!-- Row 4 -->
+    <button class="btn func" id="f7" data-val="e">e</button>
+    <button class="btn func" id="f8" data-val="tan(">tan</button>
+    <button class="btn func" id="f9" data-val="sqrt(">√</button>
+    <button class="btn" data-val="1">1</button>
+    <button class="btn" data-val="2">2</button>
+    <button class="btn" data-val="3">3</button>
+    <button class="btn op" data-val="-">−</button>
+
+    <!-- Row 5 -->
+    <button class="btn func" data-action="ans">Ans</button>
+    <button class="btn func" data-val="*10^">EXP</button>
+    <button class="btn func" data-val="^">xʸ</button>
+    <button class="btn" data-val="0">0</button>
+    <button class="btn" data-val=".">.</button>
+    <button class="btn eq" data-action="eq">=</button>
+    <button class="btn op" data-val="+">+</button>
+  </div>
+
+  <!-- Simple large buttons -->
+  <div class="buttons simple-grid" id="simple-btns" style="display:none">
+    <button class="btn ac" data-action="ac">AC</button>
+    <button class="btn func" data-action="back">⌫</button>
+    <button class="btn func" data-val="%">%</button>
+    <button class="btn op" data-val="/">÷</button>
+
+    <button class="btn" data-val="7">7</button>
+    <button class="btn" data-val="8">8</button>
+    <button class="btn" data-val="9">9</button>
+    <button class="btn op" data-val="*">×</button>
+
+    <button class="btn" data-val="4">4</button>
+    <button class="btn" data-val="5">5</button>
+    <button class="btn" data-val="6">6</button>
+    <button class="btn op" data-val="-">−</button>
+
+    <button class="btn" data-val="1">1</button>
+    <button class="btn" data-val="2">2</button>
+    <button class="btn" data-val="3">3</button>
+    <button class="btn op" data-val="+">+</button>
+
+    <button class="btn wide" data-val="0">0</button>
+    <button class="btn" data-val=".">.</button>
+    <button class="btn eq" data-action="eq">=</button>
+  </div>
+
+  <!-- Units panel -->
+  <div class="panel" id="units-panel">
+    <div class="row">
+      <label>Категория</label>
+      <select id="unit-category">
+        <option value="length">Длина</option>
+        <option value="mass">Масса</option>
+        <option value="temperature">Температура</option>
+        <option value="volume">Объём</option>
+        <option value="area">Площадь</option>
+        <option value="speed">Скорость</option>
+        <option value="time">Время</option>
+        <option value="data">Данные</option>
+      </select>
+    </div>
+    <div class="row">
+      <label>Значение</label>
+      <input type="number" id="unit-value" value="1" step="any">
+    </div>
+    <div class="unit-row row">
+      <select id="unit-from"></select>
+      <span>→</span>
+      <select id="unit-to"></select>
+    </div>
+    <div class="result-box" id="unit-result">1</div>
+  </div>
+
+  <!-- Currency panel -->
+  <div class="panel" id="currency-panel">
+    <div class="currency-header" id="curr-header">100 Доллар США равно</div>
+    <div class="currency-result" id="curr-big-result">
+      <span class="amount">4 497,51</span>
+      <span class="currency-name">Гривна</span>
+    </div>
+    <div class="currency-meta" id="rates-date">Загрузка курсов...</div>
+
+    <div class="currency-inputs">
+      <div class="currency-input-row">
+        <input type="number" id="curr-amount" value="100" step="any" inputmode="decimal">
+        <select id="curr-from">
+          <option value="USD">Доллар США</option>
+          <option value="EUR">Евро</option>
+          <option value="UAH">Гривна</option>
+          <option value="PLN">Польский злотый</option>
+          <option value="RUB">Российский рубль</option>
+          <option value="GBP">Фунт стерлингов</option>
+        </select>
+      </div>
+      <div class="currency-input-row">
+        <input type="number" id="curr-result-input" value="" step="any" inputmode="decimal" placeholder="0">
+        <select id="curr-to">
+          <option value="UAH" selected>Гривна</option>
+          <option value="USD">Доллар США</option>
+          <option value="EUR">Евро</option>
+          <option value="PLN">Польский злотый</option>
+          <option value="RUB">Российский рубль</option>
+          <option value="GBP">Фунт стерлингов</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="chart-container" id="chart-container">
+      <div class="chart-periods" id="chart-periods">
+        <button data-days="1" class="active">1Д</button>
+        <button data-days="5">5Д</button>
+        <button data-days="30">1М</button>
+        <button data-days="90">3М</button>
+        <button data-days="365">1Г</button>
+      </div>
+      <canvas id="rate-chart"></canvas>
+      <div class="chart-info" id="chart-info">График курса</div>
+    </div>
+
+    <table class="rates-table" id="rates-table">
+      <thead><tr><th>Валюта</th><th>Курс к USD</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="footer">Математический сервис • удобно на телефоне и компьютере</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/15.2.0/math.min.js"></script>
+<script>
+const exprEl = document.getElementById('expression');
+const displayEl = document.getElementById('display');
+const historyLinesEl = document.getElementById('history-lines');
+let expression = '';
+let lastResult = '0';
+let isDeg = true;
+let isInv = false;
+let currentMode = 'scientific';
+let history = []; // array of {expr, result}
+let precision = 6;
+
+function getPrecision() {
+  return parseInt(document.getElementById('precision-select')?.value || '6', 10);
+}
+
+function formatResult(value) {
+  const p = getPrecision();
+  if (typeof value === 'number') {
+    if (Math.abs(value) >= 1e10 || (Math.abs(value) > 0 && Math.abs(value) < 1e-6)) {
+      return value.toExponential(Math.min(p, 10));
+    }
+    return parseFloat(value.toPrecision(p + 2)).toFixed(p).replace(/\.?0+$/, '');
+  }
+  return math.format(value, { precision: p });
+}
+
+function updateHistoryDisplay() {
+  const lines = history.slice(-2);
+  historyLinesEl.innerHTML = lines.map(h => {
+    let e = h.expr.replace(/\*/g, '×').replace(/\//g, '÷');
+    return `<div>${e} = ${h.result}</div>`;
+  }).join('');
+}
+
+function updateDisplay() {
+  exprEl.textContent = expression || '';
+  displayEl.textContent = expression ? expression : lastResult;
+  updateHistoryDisplay();
+}
+
+function append(val) {
+  if (expression === '0' && /[0-9.]/.test(val)) expression = '';
+  expression += val;
+  updateDisplay();
+}
+
+function clearAll() {
+  expression = '';
+  lastResult = '0';
+  history = [];
+  updateDisplay();
+}
+
+function evaluate() {
+  if (!expression) return;
+  let expr = expression;
+  const originalExpr = expression;
+  try {
+    // Handle degrees for trig
+    if (isDeg) {
+      expr = expr.replace(/(sin|cos|tan)\(([^)]+)\)/g, (m, fn, arg) => `${fn}((${arg}) deg)`);
+      expr = expr.replace(/(asin|acos|atan)\(([^)]+)\)/g, (m, fn, arg) => `${fn}(${arg}) / deg`);
+    }
+    if (isInv) {
+      expr = expr.replace(/sin\(/g, 'asin(').replace(/cos\(/g, 'acos(').replace(/tan\(/g, 'atan(')
+                 .replace(/ln\(/g, 'exp(').replace(/log10\(/g, '10^').replace(/sqrt\(/g, '^2');
+    }
+    const result = math.evaluate(expr);
+    lastResult = formatResult(result);
+    history.push({ expr: originalExpr, result: lastResult });
+    if (history.length > 10) history.shift();
+    expression = '';
+    displayEl.textContent = lastResult;
+    exprEl.textContent = '';
+    updateHistoryDisplay();
+  } catch (e) {
+    displayEl.textContent = 'Ошибка';
+    setTimeout(updateDisplay, 1000);
+  }
+}
+const unitCategories = {
+  length: { m: 'метр', km: 'км', cm: 'см', mm: 'мм', mi: 'миля', ft: 'фут', inch: 'дюйм', yd: 'ярд' },
+  mass: { kg: 'кг', g: 'грамм', mg: 'мг', lb: 'фунт', oz: 'унция', t: 'тонна' },
+  temperature: { degC: '°C', degF: '°F', K: 'Кельвин' },
+  volume: { l: 'литр', ml: 'мл', m3: 'м³', gal: 'галлон', cup: 'чашка' },
+  area: { m2: 'м²', km2: 'км²', ha: 'гектар', acre: 'акр', ft2: 'фут²' },
+  speed: { 'km/h': 'км/ч', 'm/s': 'м/с', mph: 'миль/ч', knot: 'узел' },
+  time: { s: 'сек', min: 'мин', h: 'час', d: 'день', week: 'неделя', year: 'год' },
+  data: { b: 'байт', kb: 'КБ', mb: 'МБ', gb: 'ГБ', tb: 'ТБ' }
+};
+
+// Function modes for scientific calculator
+const fnModes = [
+  { // 0: Basic / Trig
+    name: 'Trig',
+    buttons: {
+      f2: { label: 'sin', val: 'sin(' },
+      f3: { label: 'ln', val: 'ln(' },
+      f4: { label: 'π', val: 'pi' },
+      f5: { label: 'cos', val: 'cos(' },
+      f6: { label: 'log', val: 'log10(' },
+      f7: { label: 'e', val: 'e' },
+      f8: { label: 'tan', val: 'tan(' },
+      f9: { label: '√', val: 'sqrt(' }
+    }
+  },
+  { // 1: Inverse / Hyperbolic
+    name: 'Inv',
+    buttons: {
+      f2: { label: 'asin', val: 'asin(' },
+      f3: { label: 'atan', val: 'atan(' },
+      f4: { label: 'π', val: 'pi' },
+      f5: { label: 'acos', val: 'acos(' },
+      f6: { label: 'log2', val: 'log2(' },
+      f7: { label: 'e', val: 'e' },
+      f8: { label: 'atan2', val: 'atan2(' },
+      f9: { label: 'cbrt', val: 'cbrt(' }
+    }
+  },
+  { // 2: Matrix
+    name: 'Mat',
+    buttons: {
+      f2: { label: 'det', val: 'det(' },
+      f3: { label: 'inv', val: 'inv(' },
+      f4: { label: '[', val: '[' },
+      f5: { label: ',', val: ',' },
+      f6: { label: ']', val: ']' },
+      f7: { label: 'trans', val: 'transpose(' },
+      f8: { label: 'eye', val: 'eye(' },
+      f9: { label: 'trace', val: 'trace(' }
+    }
+  },
+  { // 3: Stats / Number theory
+    name: 'Stat',
+    buttons: {
+      f2: { label: 'mean', val: 'mean(' },
+      f3: { label: 'std', val: 'std(' },
+      f4: { label: 'n!', val: 'factorial(' },
+      f5: { label: 'sum', val: 'sum(' },
+      f6: { label: 'gcd', val: 'gcd(' },
+      f7: { label: 'lcm', val: 'lcm(' },
+      f8: { label: 'abs', val: 'abs(' },
+      f9: { label: 'round', val: 'round(' }
+    }
+  },
+  { // 4: More math
+    name: 'More',
+    buttons: {
+      f2: { label: 'sinh', val: 'sinh(' },
+      f3: { label: 'asinh', val: 'asinh(' },
+      f4: { label: '!', val: '!' },
+      f5: { label: 'cosh', val: 'cosh(' },
+      f6: { label: 'floor', val: 'floor(' },
+      f7: { label: 'ceil', val: 'ceil(' },
+      f8: { label: 'tanh', val: 'tanh(' },
+      f9: { label: 'sign', val: 'sign(' }
+    }
+  }
+];
+
+let currentFnMode = 0;
+
+function applyFnMode(modeIndex) {
+  currentFnMode = modeIndex % fnModes.length;
+  const mode = fnModes[currentFnMode];
+  document.getElementById('fn-mode-btn').textContent = mode.name;
+  Object.entries(mode.buttons).forEach(([id, cfg]) => {
+    const btn = document.getElementById(id);
+    if (btn) {
+      btn.textContent = cfg.label;
+      btn.dataset.val = cfg.val;
+      delete btn.dataset.action; // clear inv action if any
+    }
+  });
+  // Keep Inv button special only in first mode
+  const f1 = document.getElementById('f1');
+  if (currentFnMode === 0) {
+    f1.textContent = isInv ? 'Inv*' : 'Inv';
+    f1.dataset.action = 'inv';
+    delete f1.dataset.val;
+  } else {
+    f1.textContent = 'Fn';
+    f1.dataset.action = 'fnmode';
+    delete f1.dataset.val;
+  }
+}
+
+document.querySelectorAll('.btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const val = btn.dataset.val;
+    const action = btn.dataset.action;
+    if (action === 'ac') clearAll();
+    else if (action === 'eq') evaluate();
+    else if (action === 'ans') append(lastResult);
+    else if (action === 'deg') {
+      isDeg = !isDeg;
+      btn.textContent = isDeg ? 'Deg' : 'Rad';
+      btn.style.color = isDeg ? '#1a73e8' : '#d93025';
+    }
+    else if (action === 'inv') {
+      isInv = !isInv;
+      btn.textContent = isInv ? 'Inv*' : 'Inv';
+      btn.style.background = isInv ? '#c2e7ff' : '';
+    }
+    else if (action === 'fnmode') {
+      applyFnMode(currentFnMode + 1);
+    }
+    else if (action === 'back') {
+      expression = expression.slice(0, -1);
+      updateDisplay();
+    }
+    else if (val) append(val);
+  });
+});
+
+applyFnMode(0);
+
+document.getElementById('precision-select').addEventListener('change', () => {
+  if (lastResult && lastResult !== '0' && lastResult !== 'Ошибка') {
+    // Reformat last result with new precision if possible
+    try {
+      const num = math.evaluate(lastResult);
+      lastResult = formatResult(num);
+      if (!expression) displayEl.textContent = lastResult;
+    } catch {}
+  }
+  updateHistoryDisplay();
+});
+
+// Mode switching
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentMode = btn.dataset.mode;
+    document.getElementById('scientific-btns').style.display = currentMode === 'scientific' ? 'grid' : 'none';
+    document.getElementById('simple-btns').style.display = currentMode === 'simple' ? 'grid' : 'none';
+    document.getElementById('calc-display').style.display = (currentMode === 'scientific' || currentMode === 'simple') ? 'block' : 'none';
+    document.getElementById('precision-bar').style.display = currentMode === 'scientific' ? 'flex' : 'none';
+    document.getElementById('units-panel').classList.toggle('active', currentMode === 'units');
+    document.getElementById('currency-panel').classList.toggle('active', currentMode === 'currency');
+    if (currentMode === 'currency') loadChart();
+  });
+});
+
+// Units
+function populateUnits() {
+  const cat = document.getElementById('unit-category').value;
+  const units = unitCategories[cat];
+  const from = document.getElementById('unit-from');
+  const to = document.getElementById('unit-to');
+  from.innerHTML = to.innerHTML = '';
+  Object.entries(units).forEach(([code, name]) => {
+    from.add(new Option(name, code));
+    to.add(new Option(name, code));
+  });
+  to.selectedIndex = 1;
+  convertUnits();
+}
+function convertUnits() {
+  const val = parseFloat(document.getElementById('unit-value').value) || 0;
+  const from = document.getElementById('unit-from').value;
+  const to = document.getElementById('unit-to').value;
+  try {
+    const result = math.unit(val, from).to(to);
+    document.getElementById('unit-result').textContent = math.format(result, {precision: 10});
+  } catch (e) {
+    document.getElementById('unit-result').textContent = 'Ошибка';
+  }
+}
+document.getElementById('unit-category').addEventListener('change', populateUnits);
+document.getElementById('unit-value').addEventListener('input', convertUnits);
+document.getElementById('unit-from').addEventListener('change', convertUnits);
+document.getElementById('unit-to').addEventListener('change', convertUnits);
+populateUnits();
+
+// Currency
+let rates = {};
+const currencyNames = {
+  USD: 'Доллар США',
+  EUR: 'Евро',
+  UAH: 'Гривна',
+  PLN: 'Польский злотый',
+  RUB: 'Российский рубль',
+  GBP: 'Фунт стерлингов'
+};
+
+async function loadRates() {
+  try {
+    const res = await fetch('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.min.json');
+    const data = await res.json();
+    const normalized = {};
+    for (const [k, v] of Object.entries(data.usd || {})) {
+      normalized[k.toUpperCase()] = v;
+    }
+    normalized.USD = 1;
+    rates = normalized;
+    document.getElementById('rates-date').textContent = 'Курсы на ' + data.date + ' · Источник: открытые данные';
+    updateRatesTable();
+    convertCurrency(true);
+  } catch (e) {
+    rates = { USD: 1, EUR: 0.89, UAH: 45, RUB: 95, GBP: 0.75, PLN: 3.9 };
+    document.getElementById('rates-date').textContent = 'Офлайн курсы (примерные)';
+    updateRatesTable();
+    convertCurrency(true);
+  }
+}
+
+function updateRatesTable() {
+  const tbody = document.querySelector('#rates-table tbody');
+  tbody.innerHTML = '';
+  ['USD','EUR','UAH','PLN','RUB','GBP'].forEach(c => {
+    if (rates[c]) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${currencyNames[c] || c}</td><td>${rates[c].toFixed(4)}</td>`;
+      tbody.appendChild(tr);
+    }
+  });
+}
+
+function formatNumber(n) {
+  return n.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function convertCurrency(fromTop = true) {
+  if (!rates.USD) return;
+  const from = document.getElementById('curr-from').value;
+  const to = document.getElementById('curr-to').value;
+  if (!rates[from] || !rates[to]) return;
+
+  if (fromTop) {
+    const amount = parseFloat(document.getElementById('curr-amount').value) || 0;
+    const result = amount * (rates[to] / rates[from]);
+    document.getElementById('curr-result-input').value = result.toFixed(2);
+    document.getElementById('curr-header').textContent = formatNumber(amount) + ' ' + (currencyNames[from] || from) + ' равно';
+    document.getElementById('curr-big-result').innerHTML = 
+      `<span class="amount">${formatNumber(result)}</span> <span class="currency-name">${currencyNames[to] || to}</span>`;
+  } else {
+    const amount = parseFloat(document.getElementById('curr-result-input').value) || 0;
+    const result = amount * (rates[from] / rates[to]);
+    document.getElementById('curr-amount').value = result.toFixed(2);
+    document.getElementById('curr-header').textContent = formatNumber(result) + ' ' + (currencyNames[from] || from) + ' равно';
+    document.getElementById('curr-big-result').innerHTML = 
+      `<span class="amount">${formatNumber(amount)}</span> <span class="currency-name">${currencyNames[to] || to}</span>`;
+  }
+}
+
+document.getElementById('curr-amount').addEventListener('input', () => convertCurrency(true));
+document.getElementById('curr-result-input').addEventListener('input', () => convertCurrency(false));
+document.getElementById('curr-from').addEventListener('change', () => { convertCurrency(true); loadChart(); });
+document.getElementById('curr-to').addEventListener('change', () => { convertCurrency(true); loadChart(); });
+
+// Chart
+let currentDays = 30;
+const canvas = document.getElementById('rate-chart');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * (window.devicePixelRatio || 1);
+  canvas.height = rect.height * (window.devicePixelRatio || 1);
+  ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+}
+
+async function fetchHistoricalRate(date, from, to) {
+  try {
+    const url = `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${date}/v1/currencies/${from.toLowerCase()}.min.json`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const data = await res.json();
+    const ratesObj = data[from.toLowerCase()] || {};
+    return ratesObj[to.toLowerCase()] || null;
+  } catch {
+    return null;
+  }
+}
+
+async function loadChart() {
+  const from = document.getElementById('curr-from').value;
+  const to = document.getElementById('curr-to').value;
+  if (from === to) {
+    drawChart([]);
+    document.getElementById('chart-info').textContent = 'Одинаковые валюты';
+    return;
+  }
+
+  document.getElementById('chart-info').textContent = 'Загрузка графика...';
+  const points = [];
+  const today = new Date();
+  const step = Math.max(1, Math.floor(currentDays / 20)); // sample ~20 points
+
+  for (let i = currentDays; i >= 0; i -= step) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const dateStr = d.toISOString().slice(0, 10);
+    const rate = await fetchHistoricalRate(dateStr, from, to);
+    if (rate) points.push({ date: dateStr, rate });
+    if (points.length >= 25) break;
+  }
+
+  // Also add latest if available
+  if (rates[to] && rates[from]) {
+    const latest = rates[to] / rates[from];
+    points.push({ date: 'сегодня', rate: latest });
+  }
+
+  drawChart(points);
+  document.getElementById('chart-info').textContent = 
+    points.length ? `Курс ${from}/${to} за ${currentDays} дн.` : 'Нет данных';
+}
+
+function drawChart(points) {
+  resizeCanvas();
+  const w = canvas.width / (window.devicePixelRatio || 1);
+  const h = canvas.height / (window.devicePixelRatio || 1);
+  ctx.clearRect(0, 0, w, h);
+
+  if (points.length < 2) {
+    ctx.fillStyle = '#9aa0a6';
+    ctx.font = '14px Roboto, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Недостаточно данных', w/2, h/2);
+    return;
+  }
+
+  const rates = points.map(p => p.rate);
+  const min = Math.min(...rates);
+  const max = Math.max(...rates);
+  const range = max - min || 0.01;
+
+  ctx.beginPath();
+  ctx.strokeStyle = '#1a73e8';
+  ctx.lineWidth = 2;
+  ctx.lineJoin = 'round';
+
+  points.forEach((p, i) => {
+    const x = (i / (points.length - 1)) * (w - 20) + 10;
+    const y = h - 20 - ((p.rate - min) / range) * (h - 40);
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Fill under curve
+  ctx.lineTo(w - 10, h - 20);
+  ctx.lineTo(10, h - 20);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(26, 115, 232, 0.1)';
+  ctx.fill();
+
+  // Labels
+  ctx.fillStyle = '#5f6368';
+  ctx.font = '11px Roboto, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText(min.toFixed(4), 4, h - 4);
+  ctx.textAlign = 'right';
+  ctx.fillText(max.toFixed(4), w - 4, 12);
+}
+
+document.querySelectorAll('#chart-periods button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#chart-periods button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentDays = parseInt(btn.dataset.days);
+    loadChart();
+  });
+});
+
+loadRates().then(() => loadChart());
+window.addEventListener('resize', () => loadChart());
+
+// Keyboard support
+document.addEventListener('keydown', e => {
+  if (currentMode !== 'scientific' && currentMode !== 'simple') return;
+  if (/[0-9.]/.test(e.key)) append(e.key);
+  else if (e.key === ',') append(',');
+  else if (e.key === '[') append('[');
+  else if (e.key === ']') append(']');
+  else if (e.key === '+') append('+');
+  else if (e.key === '-') append('-');
+  else if (e.key === '*') append('*');
+  else if (e.key === '/') append('/');
+  else if (e.key === '(' || e.key === ')') append(e.key);
+  else if (e.key === 'Enter' || e.key === '=') { e.preventDefault(); evaluate(); }
+  else if (e.key === 'Escape') clearAll();
+  else if (e.key === 'Backspace') {
+    expression = expression.slice(0, -1);
+    updateDisplay();
+  }
+});
+
+updateDisplay();
+document.getElementById('precision-bar').style.display = 'flex';
+</script>
+</body>
+</html>
