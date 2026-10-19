@@ -13,7 +13,7 @@ Calculatrice scientifique, convertisseur d'unités et de devises dans un seul `i
 
 Ouvrez `index.html` dans un navigateur, ou lancez `npm start` puis allez sur http://localhost:8080.
 
-**Essayer en ligne** (sans installation) : [ouvrir la variante calculatorEF](https://htmlpreview.github.io/?https://github.com/Michael-VT/web-calculator-suite/blob/main/variants/calculatorEF.html) — la variante précédente dont est issue la version actuelle ; elle charge math.js depuis un CDN, Internet est donc nécessaire.
+**Essayer en ligne** (sans installation) : [ouvrir la calculatrice](https://michael-vt.github.io/web-calculator-suite/) · [variante précédente calculatorEF](https://michael-vt.github.io/web-calculator-suite/variants/calculatorEF.html) (charge math.js depuis un CDN, Internet nécessaire).
 
 ## Documentation
 

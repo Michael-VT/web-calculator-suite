@@ -13,7 +13,7 @@
 
 Откройте `index.html` в браузере или `npm start` → http://localhost:8080.
 
-**Посмотреть онлайн** (без установки): [открыть вариант calculatorEF](https://htmlpreview.github.io/?https://github.com/Michael-VT/web-calculator-suite/blob/main/variants/calculatorEF.html) — прежний вариант, из которого выросла текущая версия; он подгружает math.js с CDN, поэтому нужен интернет.
+**Посмотреть онлайн** (без установки): [открыть калькулятор](https://michael-vt.github.io/web-calculator-suite/) · [прежний вариант calculatorEF](https://michael-vt.github.io/web-calculator-suite/variants/calculatorEF.html) (подгружает math.js с CDN, нужен интернет).
 
 ## Документация
 
