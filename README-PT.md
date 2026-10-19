@@ -13,6 +13,8 @@ Calculadora científica, conversor de unidades e de moedas num único `index.htm
 
 Abra `index.html` no navegador, ou execute `npm start` e aceda a http://localhost:8080.
 
+**Experimente online** (sem instalar): [abrir a variante calculatorEF](https://htmlpreview.github.io/?https://github.com/Michael-VT/web-calculator-suite/blob/main/variants/calculatorEF.html) — a variante anterior da qual a versão atual evoluiu; carrega o math.js de uma CDN, por isso precisa de internet.
+
 ## Documentação
 
 | Documento | Conteúdo |

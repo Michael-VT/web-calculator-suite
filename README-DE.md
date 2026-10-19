@@ -13,6 +13,8 @@ Wissenschaftlicher Taschenrechner, Einheiten- und Währungsumrechner in einer ei
 
 `index.html` im Browser öffnen oder `npm start` ausführen und http://localhost:8080 aufrufen.
 
+**Online ausprobieren** (ohne Installation): [Variante calculatorEF öffnen](https://htmlpreview.github.io/?https://github.com/Michael-VT/web-calculator-suite/blob/main/variants/calculatorEF.html) — die frühere Variante, aus der die aktuelle Version entstanden ist; sie lädt math.js von einem CDN und benötigt daher Internet.
+
 ## Dokumentation
 
 | Dokument | Inhalt |

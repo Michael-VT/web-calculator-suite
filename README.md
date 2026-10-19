@@ -13,6 +13,8 @@ A scientific calculator, unit converter and currency converter in a single `inde
 
 Open `index.html` in a browser, or run `npm start` and go to http://localhost:8080.
 
+**Try it online** (no install): [open the calculatorEF variant](https://htmlpreview.github.io/?https://github.com/Michael-VT/web-calculator-suite/blob/main/variants/calculatorEF.html) — the earlier variant the current version grew from; it loads math.js from a CDN, so it needs internet.
+
 ## Documentation
 
 | Document | Content |
